@@ -31,7 +31,7 @@ export class AppError extends Error {
     public code: string,
     public message: string,
     public status: number = 400,
-    public details?: Record<string, any>
+    public details?: Record<string, unknown>
   ) {
     super(message)
     this.name = "AppError"
@@ -39,7 +39,7 @@ export class AppError extends Error {
 }
 
 export class ValidationError extends AppError {
-  constructor(message: string, details?: Record<string, any>) {
+  constructor(message: string, details?: Record<string, unknown>) {
     super("VALIDATION_ERROR", message, 400, details)
     this.name = "ValidationError"
   }
@@ -91,11 +91,12 @@ export class InternalServerError extends AppError {
 // RESPONSE TYPES
 // ============================================================
 
-export interface ApiResponse<T = any> {
+export interface ApiResponse<T = unknown> {
   success: boolean
   data?: T
   error?: string
   code?: string
+  details?: Record<string, unknown>
   timestamp: number
 }
 
@@ -181,24 +182,28 @@ export function apiValidationError(
  *   // Your code here
  * })
  */
-export function withErrorHandling<T extends Record<string, any>>(
+export function withErrorHandling<T extends Record<string, unknown>>(
   handler: (
     req: NextRequest,
     context: T
-  ) => Promise<NextResponse<any> | Response>
+  ) => Promise<NextResponse<unknown> | Response>
 ) {
   return async (req: NextRequest, context: T) => {
     try {
       const response = await handler(req, context)
       return response
     } catch (error) {
-      console.error(`[${req.method} ${req.nextUrl.pathname}]`, error)
-
       if (error instanceof AppError) {
+        if (error.status >= 500) {
+          console.error(`[${req.method} ${req.nextUrl.pathname}]`, error)
+        }
+
         return apiError(error, req)
       }
 
       if (error instanceof Error) {
+        console.error(`[${req.method} ${req.nextUrl.pathname}]`, error)
+
         // Log detailed errors in development
         if (process.env.NODE_ENV === "development") {
           console.error("Full error:", error)
@@ -238,7 +243,7 @@ export function getUserAgent(request: NextRequest): string | undefined {
 /**
  * Safely parses JSON request body
  */
-export async function parseJsonBody<T = any>(
+export async function parseJsonBody<T = unknown>(
   request: NextRequest
 ): Promise<T> {
   try {
