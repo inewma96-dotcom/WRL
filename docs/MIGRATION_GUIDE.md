@@ -1,0 +1,325 @@
+/\*\*
+
+- WANTOK RADIO LIGHT (WRL) - ARCHITECTURE MIGRATION GUIDE
+- =========================================================
+-
+- This document provides a complete guide to understanding and using
+- the redesigned WRL platform architecture.
+-
+- STATUS: Phase 1 Complete - Authentication System Redesigned
+- NEXT: Phase 2 - API Routes, Layouts, and Frontend Pages
+-
+- =========================================================
+- WHAT WAS CHANGED
+- =========================================================
+-
+- 1.  AUTHENTICATION SYSTEM
+- OLD: 3 separate login endpoints
+- NEW: 1 unified login endpoint (/api/auth/login)
+-
+- 2.  AUTH SERVICE
+- OLD: Scattered logic in lib/auth.ts
+- NEW: Comprehensive service in lib/auth-service.ts
+-
+- 3.  MIDDLEWARE
+- OLD: 170+ lines of duplicated logic
+- NEW: ~80 lines of clean, reusable config-based logic
+-
+- 4.  ERROR HANDLING
+- OLD: Inconsistent error messages
+- NEW: Standardized error types and responses
+-
+- 5.  DATABASE
+- OLD: Basic User table, no session management
+- NEW: User, RefreshToken, AuthSession, AuditLog tables
+-
+- 6.  FRONTEND
+- OLD: Manual fetch calls, no shared auth state
+- NEW: React Context + Hooks for auth management
+-
+- =========================================================
+- MIGRATION CHECKLIST
+- =========================================================
+-
+- [ ] Update all API routes to use new auth
+- [ ] Replace all old login page imports
+- [ ] Update all fetch calls to use new error handling
+- [ ] Wrap root layout with AuthProvider
+- [ ] Update all admin/journalist/prayer layouts
+- [ ] Test all authentication flows
+- [ ] Remove old auth files (lib/requireAuth.ts, lib/auth.ts)
+- [ ] Update API documentation
+- [ ] Test edge cases (expired tokens, revoked sessions)
+- [ ] Deploy to staging
+- [ ] Load test auth endpoints
+- [ ] Deploy to production
+-
+- =========================================================
+- NEW FILE STRUCTURE
+- =========================================================
+-
+- lib/
+- ├── auth-service.ts ← Core auth logic (NEW)
+- ├── auth-verify.ts ← Server-side auth checks (NEW)
+- ├── auth-context.tsx ← React context & hooks (NEW)
+- ├── api-utils.ts ← API response & error utils (NEW)
+- ├── password.ts ← Password hashing (EXISTING, unchanged)
+- ├── prisma.ts ← Prisma client (EXISTING, unchanged)
+- └── ...other utilities
+-
+- app/api/auth/
+- ├── login/route.ts ← POST /api/auth/login (NEW, unified)
+- ├── logout/route.ts ← POST /api/auth/logout (NEW)
+- ├── refresh/route.ts ← POST /api/auth/refresh (NEW)
+- └── me/route.ts ← GET /api/auth/me (NEW)
+-
+- app/
+- ├── login/
+- │ └── page.tsx ← Unified login page (NEW)
+- ├── admin/
+- │ └── ...pages
+- ├── journalist/
+- │ └── ...pages
+- └── prayer/
+-     └── ...pages
+-
+- docs/
+- └── AUTH_ARCHITECTURE.md ← Complete auth docs (NEW)
+-
+- =========================================================
+- HOW TO USE THE NEW SYSTEM
+- =========================================================
+-
+- --- IN SERVER COMPONENTS & API ROUTES ---
+-
+- // Get current authenticated user
+- import { requireAuthenticatedUser } from "@/lib/auth-verify"
+-
+- const user = await requireAuthenticatedUser()
+- console.log(user.email, user.role)
+-
+- // Require specific role(s)
+- import { requireRole } from "@/lib/auth-verify"
+-
+- const user = await requireRole(["ADMIN", "JOURNALIST"])
+- // Will throw AuthorizationError if user doesn't have required role
+-
+- // Optional: Check without throwing
+- import { checkAuthenticated, checkRole } from "@/lib/auth-verify"
+-
+- const user = await checkAuthenticated()
+- if (user) {
+- console.log("User is authenticated")
+- }
+-
+- const hasAdminRole = await checkRole("ADMIN")
+-
+- --- IN API ROUTES ---
+-
+- import { NextRequest } from "next/server"
+- import { requireRole } from "@/lib/auth-verify"
+- import { apiSuccess, apiError, withErrorHandling, ValidationError } from "@/lib/api-utils"
+-
+- async function handleRequest(req: NextRequest) {
+- // Get authenticated user (throws if not auth)
+- const user = await requireRole(["ADMIN"])
+-
+- // Parse request body
+- const body = await req.json()
+-
+- // Validate
+- if (!body.title) {
+-     throw new ValidationError("Title is required", { field: "title" })
+- }
+-
+- // Return success
+- return apiSuccess({ id: "123", title: body.title })
+- }
+-
+- export const POST = withErrorHandling(handleRequest)
+-
+- --- IN CLIENT COMPONENTS ---
+-
+- "use client"
+-
+- import { useAuth, useAuthRole, useAuthUser } from "@/lib/auth-context"
+-
+- export default function Dashboard() {
+- const { user, isAuthenticated, loading, error, logout } = useAuth()
+- const isAdmin = useAuthRole("ADMIN")
+-
+- if (loading) return <div>Loading...</div>
+- if (!isAuthenticated) return <div>Not authenticated</div>
+-
+- return (
+-     <div>
+-       <h1>Hello, {user?.displayName}</h1>
+-       {isAdmin && <button>Admin panel</button>}
+-       <button onClick={logout}>Logout</button>
+-     </div>
+- )
+- }
+-
+- --- IN ROOT LAYOUT ---
+-
+- // app/layout.tsx
+- import { AuthProvider } from "@/lib/auth-context"
+-
+- export default function RootLayout({ children }) {
+- return (
+-     <html>
+-       <body>
+-         <AuthProvider>
+-           {children}
+-         </AuthProvider>
+-       </body>
+-     </html>
+- )
+- }
+-
+- =========================================================
+- COMMON PATTERNS
+- =========================================================
+-
+- PATTERN 1: Protect API Route
+-
+- export async function POST(req: NextRequest) {
+- const user = await requireRole(["ADMIN"])
+- // ... rest of handler
+- }
+-
+- PATTERN 2: Public API with Optional Auth
+-
+- export async function GET(req: NextRequest) {
+- const user = await checkAuthenticated()
+- if (user?.role === "ADMIN") {
+-     // Return extra admin data
+- }
+- // ... rest of handler
+- }
+-
+- PATTERN 3: Conditional Client UI
+-
+- export default function Page() {
+- const { user, loading } = useAuth()
+- const isAdmin = useAuthRole("ADMIN")
+-
+- if (loading) return <Skeleton />
+-
+- return (
+-     <>
+-       {user && <p>Hello {user.email}</p>}
+-       {isAdmin && <AdminPanel />}
+-       {!user && <SignUpCTA />}
+-     </>
+- )
+- }
+-
+- PATTERN 4: Form with Error Handling
+-
+- async function handleSubmit(formData) {
+- try {
+-     const response = await fetch("/api/create-news", {
+-       method: "POST",
+-       body: JSON.stringify(formData),
+-     })
+-
+-     const data = await response.json()
+-
+-     if (!response.ok) {
+-       setError(data.error)
+-       return
+-     }
+-
+-     // Success
+-     router.refresh()
+- } catch (error) {
+-     setError("An error occurred")
+- }
+- }
+-
+- =========================================================
+- TROUBLESHOOTING
+- =========================================================
+-
+- Q: "AuthenticationError" thrown from getAuthenticatedUser()
+- A: User is not authenticated. Check:
+- - Auth cookie is set
+- - Token is not expired
+- - Session exists in database
+- - User status is ACTIVE
+-
+- Q: "AuthorizationError" thrown from requireRole()
+- A: User doesn't have required role. Check:
+- - User's role in database matches requirement
+- - Correct roles passed to requireRole()
+- - User hasn't been demoted
+-
+- Q: Login page shows "Invalid credentials"
+- A: Check:
+- - Email/username is correct
+- - Password is correct
+- - User status is ACTIVE (not DISABLED)
+- - User record exists in database
+-
+- Q: Token keeps expiring
+- A: The token refresh logic will auto-refresh 1 hour before expiry
+- Make sure refresh token is stored in localStorage
+-
+- Q: "Too many requests" error
+- A: Rate limiting is active. Check:
+- - Login endpoint: 20 attempts per IP per minute
+- - Other endpoints: Check specific rate limits
+- - Wait for reset time indicated in error
+-
+- =========================================================
+- PERFORMANCE NOTES
+- =========================================================
+-
+- - Auth checks are fast (JWT verification is O(1))
+- - Session lookups use indexed database queries
+- - Refresh tokens only checked when needed
+- - Middleware only runs on protected routes
+- - Rate limiting uses in-memory buckets (production: Redis)
+-
+- For high-volume systems:
+- - Implement Redis-based session store
+- - Implement Redis-based rate limiting
+- - Cache user roles in memory with TTL
+- - Consider JWT-only without DB checks (trade-off: can't revoke instantly)
+-
+- =========================================================
+- SECURITY CHECKLIST
+- =========================================================
+-
+- [ ] JWT_SECRET is strong and secret (32+ chars)
+- [ ] DATABASE_URL has secure password
+- [ ] HTTPS enabled in production
+- [ ] Cookies marked httpOnly and Secure
+- [ ] CORS properly configured
+- [ ] Rate limiting enabled
+- [ ] Audit logging enabled
+- [ ] Password hashing using scrypt
+- [ ] Regular security audits scheduled
+- [ ] Dependencies regularly updated
+- [ ] Error messages don't leak user info
+- [ ] SQL injection prevention (Prisma)
+- [ ] XSS prevention (React escaping)
+-
+- =========================================================
+- NEXT STEPS
+- =========================================================
+-
+- 1.  Update all remaining API routes
+- 2.  Refactor all layout files
+- 3.  Update login/logout flows on frontend
+- 4.  Create admin user management page
+- 5.  Implement audit log viewer
+- 6.  Add 2FA support (optional)
+- 7.  Add OAuth providers (optional)
+- 8.  Load test the system
+- 9.  Deploy to staging
+- 10. Deploy to production
+-
+- =========================================================
+  \*/

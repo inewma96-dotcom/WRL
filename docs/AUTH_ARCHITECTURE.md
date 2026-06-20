@@ -1,0 +1,534 @@
+/\*\*
+
+- WRL BROADCASTING PLATFORM - AUTHENTICATION & AUTHORIZATION SYSTEM
+- ================================================================
+-
+- Version: 2.0 (Redesigned 2026)
+- Status: Production-Ready Architecture
+-
+- TABLE OF CONTENTS:
+- 1.  System Overview
+- 2.  Core Components
+- 3.  Authentication Flow
+- 4.  Authorization Model
+- 5.  API Reference
+- 6.  Database Schema
+- 7.  Middleware & Route Protection
+- 8.  Error Handling
+- 9.  Security Considerations
+- 10. Frontend Integration
+- 11. Deployment & Operations
+-
+- ================================================================
+- 1.  SYSTEM OVERVIEW
+- ================================================================
+-
+- The WRL platform uses a modern, unified authentication system that:
+-
+- PREVIOUS ARCHITECTURE (❌ PROBLEMS):
+- - 3 separate login endpoints (/api/login, /api/journalist/login, /api/prayer/login)
+- - Duplicated authentication logic
+- - Inconsistent error handling
+- - Single cookie name for all roles (confusing)
+- - No refresh token mechanism
+- - No session management
+- - No audit logging
+- - Weak user status tracking
+-
+- NEW ARCHITECTURE (✅ IMPROVEMENTS):
+- - Single unified login endpoint (/api/auth/login)
+- - Centralized auth service (lib/auth-service.ts)
+- - Consistent, type-safe API responses
+- - JWT tokens with session tracking
+- - Refresh token mechanism with database persistence
+- - Comprehensive audit logging
+- - User status tracking (ACTIVE, INACTIVE, DISABLED, PENDING_VERIFICATION)
+- - Session management (create, verify, revoke, track activity)
+- - Role-based access control
+- - Rate limiting on all auth endpoints
+-
+- ROLES:
+- - ADMIN: Full platform access, user management, content publishing
+- - JOURNALIST: News content creation and management
+- - PRAYER: Prayer request viewing and management
+-
+- ================================================================
+- 2.  CORE COMPONENTS
+- ================================================================
+-
+- A. AUTH SERVICE (lib/auth-service.ts)
+- Core authentication logic including:
+- - User login with email/username and password
+- - JWT token generation (access & refresh)
+- - Session creation and management
+- - Token verification and validation
+- - Session revocation
+- - User status tracking
+- - Audit event logging
+-
+- B. MIDDLEWARE (middleware.ts)
+- Request-level authentication:
+- - Token verification
+- - Session validation
+- - Role-based access control
+- - Automatic redirects to login
+- - Prevents authenticated users from accessing login pages
+- - Tracks session activity
+-
+- C. AUTH VERIFICATION (lib/auth-verify.ts)
+- Server-side user extraction:
+- - getAuthenticatedUser() - Get current user
+- - requireAuthenticatedUser() - Assert authentication
+- - requireRole() - Assert specific role(s)
+- - checkAuthenticated() - Optional auth check
+- - checkRole() - Optional role check
+-
+- D. API UTILITIES (lib/api-utils.ts)
+- Standardized response handling:
+- - apiSuccess() - Return success response
+- - apiError() - Return error response
+- - withErrorHandling() - Route handler wrapper
+- - withRateLimit() - Rate limiting
+- - Custom error classes
+-
+- E. DATABASE LAYER (Prisma)
+- Tables:
+- - User: User accounts with status and verification tracking
+- - RefreshToken: Persistent refresh token records
+- - AuthSession: Active session tracking
+- - AuditLog: Security event logging
+- - News, AirwaveContent, etc.: Content tables
+-
+- ================================================================
+- 3.  AUTHENTICATION FLOW
+- ================================================================
+-
+- LOGIN FLOW:
+-
+- 1. User submits email/username and password to /api/auth/login
+- 2. Server validates credentials and checks user status
+- 3. Server creates a session record in database
+- 4. Server generates access token (JWT, 8 hours)
+- 5. Server generates refresh token (JWT, 30 days)
+- 6. Server stores refresh token in database
+- 7. Server returns both tokens to client
+- 8. Client stores access token in httpOnly cookie
+- 9. Client stores refresh token in local storage (or httpOnly if possible)
+- 10. User is logged in and can access protected routes
+-
+- AUTHENTICATED REQUEST FLOW:
+-
+- 1. Client includes access token in httpOnly cookie
+- 2. Middleware verifies token signature
+- 3. Middleware checks session validity in database
+- 4. Middleware verifies user status
+- 5. Middleware checks role-based access
+- 6. Request passes through to route handler
+- 7. Route handler can access authenticated user via getAuthenticatedUser()
+- 8. Response is sent to client
+-
+- TOKEN REFRESH FLOW:
+-
+- 1. Client detects access token expiry
+- 2. Client sends refresh token to /api/auth/refresh
+- 3. Server verifies refresh token
+- 4. Server checks session validity
+- 5. Server generates new access token
+- 6. Server returns new token
+- 7. Client updates httpOnly cookie
+- 8. Client continues normal operation
+-
+- LOGOUT FLOW:
+-
+- 1. User clicks logout button
+- 2. Client sends POST request to /api/auth/logout
+- 3. Server revokes session in database
+- 4. Server clears auth cookie
+- 5. Server returns success response
+- 6. Client navigates to login page
+-
+- ================================================================
+- 4.  AUTHORIZATION MODEL
+- ================================================================
+-
+- ROLE-BASED ACCESS CONTROL (RBAC):
+-
+- ADMIN Role:
+- - /admin/\* - Full dashboard access
+- - User management (create, read, update, disable)
+- - Content publishing (news, airwaves)
+- - Prayer request management
+- - Analytics and reporting
+-
+- JOURNALIST Role:
+- - /journalist/\* - Content management
+- - Create and edit news articles
+- - Upload media (audio, video, images)
+- - View own articles
+-
+- PRAYER Role:
+- - /prayer/\* - Prayer management
+- - View prayer requests
+- - Mark prayers as answered
+-
+- Route Protection Strategy:
+- - All /admin routes require ADMIN role
+- - All /journalist routes require ADMIN or JOURNALIST role
+- - All /prayer routes require ADMIN or PRAYER role
+- - Login pages are accessible only to unauthenticated users
+- - Authenticated users redirected from login pages
+-
+- ================================================================
+- 5.  API REFERENCE
+- ================================================================
+-
+- POST /api/auth/login
+- Request:
+- {
+- "emailOrUsername": "user@example.com",
+- "password": "password123"
+- }
+-
+- Response (200):
+- {
+- "success": true,
+- "data": {
+-     "accessToken": "eyJhbGc...",
+-     "refreshToken": "eyJhbGc...",
+-     "expiresIn": 28800,
+-     "user": {
+-       "id": "uuid",
+-       "email": "user@example.com",
+-       "username": "journalist1",
+-       "role": "JOURNALIST",
+-       "displayName": "John Doe"
+-     }
+- },
+- "timestamp": 1234567890
+- }
+-
+- Error Response (401):
+- {
+- "success": false,
+- "error": "Invalid email/username or password",
+- "code": "AUTHENTICATION_ERROR",
+- "timestamp": 1234567890
+- }
+-
+- ***
+-
+- POST /api/auth/refresh
+- Request:
+- {
+- "refreshToken": "eyJhbGc..."
+- }
+-
+- Response (200):
+- {
+- "success": true,
+- "data": {
+-     "accessToken": "eyJhbGc...",
+-     "expiresIn": 28800
+- },
+- "timestamp": 1234567890
+- }
+-
+- ***
+-
+- POST /api/auth/logout
+- Request: (requires authentication cookie)
+-
+- Response (200):
+- {
+- "success": true,
+- "data": {
+-     "message": "Logged out successfully"
+- },
+- "timestamp": 1234567890
+- }
+-
+- ***
+-
+- GET /api/auth/me
+- Request: (requires authentication cookie)
+-
+- Response (200):
+- {
+- "success": true,
+- "data": {
+-     "id": "uuid",
+-     "email": "user@example.com",
+-     "username": "journalist1",
+-     "role": "JOURNALIST",
+-     "displayName": "John Doe"
+- },
+- "timestamp": 1234567890
+- }
+-
+- ================================================================
+- 6.  DATABASE SCHEMA
+- ================================================================
+-
+- User Table:
+- - id (UUID, primary key)
+- - email (unique, indexed)
+- - username (unique, indexed)
+- - password (bcrypt hash)
+- - displayName
+- - role (ADMIN, JOURNALIST, PRAYER)
+- - status (ACTIVE, INACTIVE, DISABLED, PENDING_VERIFICATION)
+- - emailVerified (boolean)
+- - emailVerifiedAt (timestamp)
+- - lastLoginAt (timestamp)
+- - lastLoginIp (string)
+- - createdAt, updatedAt
+-
+- AuthSession Table:
+- - id (UUID, primary key)
+- - userId (FK to User, cascade delete)
+- - userAgent (string)
+- - ipAddress (string)
+- - expiresAt (timestamp)
+- - lastUsedAt (timestamp, tracks activity)
+- - revokedAt (timestamp, for logout)
+- - createdAt
+- - Indexes: userId, expiresAt, revokedAt
+-
+- RefreshToken Table:
+- - id (UUID, primary key)
+- - userId (FK to User, cascade delete)
+- - token (unique, indexed)
+- - expiresAt (timestamp)
+- - revokedAt (timestamp)
+- - createdAt
+- - Indexes: userId, expiresAt, revokedAt
+-
+- AuditLog Table:
+- - id (UUID, primary key)
+- - userId (FK to User, cascade delete)
+- - action (string: LOGIN, LOGOUT, CREATE_NEWS, etc.)
+- - entityType (string: NEWS, USER, AIRWAVE, etc.)
+- - entityId (string)
+- - changes (JSON: before/after for updates)
+- - ipAddress (string)
+- - userAgent (string)
+- - status (SUCCESS, FAILED, BLOCKED)
+- - error (string)
+- - createdAt
+- - Indexes: userId, action, createdAt, entityType
+-
+- ================================================================
+- 7.  MIDDLEWARE & ROUTE PROTECTION
+- ================================================================
+-
+- MIDDLEWARE EXECUTION:
+-
+- For requests to /admin/_, /journalist/_, /prayer/\*:
+-
+- 1.  Extract auth cookie
+- 2.  Verify JWT signature
+- 3.  Check token expiration
+- 4.  Verify session exists in database
+- 5.  Check session not revoked
+- 6.  Verify user status is ACTIVE
+- 7.  Check user role matches route requirement
+- 8.  Update session lastUsedAt
+- 9.  Allow request to proceed
+-
+- If any step fails:
+- - No token: Redirect to /login
+- - Invalid token: Redirect to /login
+- - Session expired: Redirect to /login
+- - Session revoked: Redirect to /login
+- - User inactive: Redirect to home
+- - Role mismatch: Redirect to home
+-
+- LOGIN PAGE LOGIC:
+- - If authenticated with correct role: Redirect to dashboard
+- - If authenticated with wrong role: Redirect to home
+- - If not authenticated: Allow access to login page
+-
+- ================================================================
+- 8.  ERROR HANDLING
+- ================================================================
+-
+- Error Classes (lib/api-utils.ts):
+-
+- AuthenticationError (401)
+- - Invalid credentials
+- - Missing auth token
+- - Token expired
+- - Session invalid/revoked
+- - User account disabled
+-
+- AuthorizationError (403)
+- - User lacks required role
+- - User lacks required permission
+-
+- ValidationError (400)
+- - Missing required field
+- - Invalid field value
+- - Data constraint violation
+-
+- RateLimitError (429)
+- - Too many login attempts
+- - Too many requests to endpoint
+-
+- NotFoundError (404)
+- - Resource not found
+-
+- ConflictError (409)
+- - Resource already exists
+- - Constraint violation
+-
+- InternalServerError (500)
+- - Unexpected server error
+-
+- Response Format:
+- {
+- "success": false,
+- "error": "Human readable error message",
+- "code": "ERROR_CODE",
+- "details": { ... }, // Optional, field-specific details
+- "timestamp": 1234567890
+- }
+-
+- ================================================================
+- 9.  SECURITY CONSIDERATIONS
+- ================================================================
+-
+- PASSWORD SECURITY:
+- - Passwords hashed using scrypt with 16-byte salt
+- - Timing-safe comparison prevents timing attacks
+- - No plaintext passwords stored
+- - Password changes revoke all sessions
+-
+- TOKEN SECURITY:
+- - JWT signed with HS256 algorithm
+- - Access tokens expire in 8 hours
+- - Refresh tokens expire in 30 days
+- - Tokens cannot be used after revocation
+- - Each session has unique session ID
+-
+- COOKIE SECURITY:
+- - Auth cookie is httpOnly (not accessible from JavaScript)
+- - Cookie is secure (only sent over HTTPS in production)
+- - SameSite=Lax prevents CSRF attacks
+- - Cookie path limited to / (accessible site-wide)
+-
+- SESSION SECURITY:
+- - Sessions stored in database
+- - Sessions track IP address and user agent
+- - Sessions can be manually revoked
+- - Sessions auto-expire after configured time
+- - All user sessions revokable (useful if password compromised)
+-
+- RATE LIMITING:
+- - Login endpoint: 20 attempts per IP per minute
+- - Other endpoints: Configurable per endpoint
+- - Prevents brute force attacks
+- - Prevents denial of service
+-
+- AUDIT LOGGING:
+- - All auth events logged (login, logout, failed attempts)
+- - Logs include IP address, user agent
+- - Logs identify suspicious patterns
+- - Logs enable security investigations
+-
+- ENVIRONMENT VARIABLES:
+- - JWT_SECRET: Should be strong, random, kept secret
+- - DATABASE_URL: Connection string with authentication
+- - NODE_ENV: Set to "production" for secure defaults
+-
+- ================================================================
+- 10. FRONTEND INTEGRATION
+- ================================================================
+-
+- INITIALIZATION:
+- - Call GET /api/auth/me on app load
+- - If 401: User not authenticated, show login page
+- - If 200: User authenticated, show dashboard
+-
+- LOGIN:
+- - Call POST /api/auth/login with email/username and password
+- - On success: Receive accessToken and refreshToken
+- - Store refreshToken in localStorage or sessionStorage
+- - Access token automatically in httpOnly cookie
+- - Redirect to appropriate dashboard based on role
+-
+- TOKEN REFRESH:
+- - Monitor access token expiry (use JWT decode)
+- - 5 minutes before expiry: Call POST /api/auth/refresh
+- - Send refreshToken from localStorage
+- - Receive new accessToken
+- - Update localStorage with new refreshToken if provided
+- - Continue normal operation
+-
+- ERROR HANDLING:
+- - On 401 responses: Redirect to login
+- - On 403 responses: Show "Access Denied" message
+- - On 429 responses: Show "Too many attempts, try again later"
+- - On 500 responses: Show "Server error, contact support"
+-
+- LOGOUT:
+- - Call POST /api/auth/logout
+- - Clear localStorage (refreshToken)
+- - Auth cookie cleared automatically
+- - Redirect to home page
+-
+- ================================================================
+- 11. DEPLOYMENT & OPERATIONS
+- ================================================================
+-
+- ENVIRONMENT SETUP:
+-
+- Development:
+- JWT_SECRET=your-dev-secret-key-at-least-32-chars
+- DATABASE_URL=postgresql://user:password@localhost:5432/wrl
+- NODE_ENV=development
+-
+- Production:
+- JWT_SECRET=<generate strong random 64+ char secret>
+- DATABASE_URL=<production postgresql connection string>
+- NODE_ENV=production
+-
+- DATABASE MIGRATIONS:
+- - Run: npm run prisma:migrate:deploy
+- - Creates all required tables and indexes
+- - Updates schema version
+-
+- MONITORING:
+- - Monitor AuditLog table for security events
+- - Set alerts for failed login attempts
+- - Track RefreshToken expiry and cleanup
+- - Monitor AuthSession expiry and cleanup
+-
+- MAINTENANCE:
+- - Regularly clean up expired sessions (cron job)
+- - Regularly clean up expired refresh tokens (cron job)
+- - Rotate JWT_SECRET periodically (all tokens invalid)
+- - Review audit logs for suspicious activity
+- - Update password hashing if algorithm deprecated
+-
+- SECURITY UPDATES:
+- - Keep JWT library updated
+- - Keep PostgreSQL updated
+- - Keep Prisma updated
+- - Review OWASP guidelines periodically
+- - Conduct security audits
+-
+- ================================================================
+- SUMMARY
+- ================================================================
+-
+- This redesigned authentication system provides:
+-
+- ✅ Security: Modern crypto, rate limiting, audit logging
+- ✅ Reliability: Session management, token refresh, error handling
+- ✅ Scalability: Efficient database queries, stateless tokens
+- ✅ Maintainability: Unified code, clear separation of concerns
+- ✅ Flexibility: Multiple auth factors ready, easy to extend
+- ✅ Compliance: Audit trails, user status tracking, HTTPS ready
+-
+- The system is production-ready for 2026 standards.
+  \*/

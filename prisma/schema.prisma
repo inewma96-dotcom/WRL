@@ -1,0 +1,150 @@
+generator client {
+    provider = "prisma-client-js"
+}
+
+datasource db {
+    provider = "sqlite"
+    url      = "file:./dev.db"
+}
+
+model User {
+    id              String  @id @default(uuid())
+    email           String  @unique
+    username        String? @unique
+    password        String
+    displayName     String?
+    displayPassword String?
+    role            String  @default("ADMIN")
+    status          String  @default("ACTIVE")
+
+    // Auth fields
+    lastLoginAt DateTime?
+    lastLoginIp String?
+
+    // Relations
+    news          News[]
+    authSessions  AuthSession[]
+    refreshTokens RefreshToken[]
+    auditLogs     AuditLog[]
+
+    createdAt DateTime @default(now())
+}
+
+model News {
+    id        String  @id @default(cuid())
+    title     String
+    content   String
+    mediaUrl  String?
+    mediaType String?
+    isHidden  Boolean @default(false)
+
+    authorId String?
+    author   User?   @relation(fields: [authorId], references: [id])
+
+    createdAt DateTime @default(now())
+}
+
+model AirwaveContent {
+    id          String  @id @default(cuid())
+    title       String
+    description String?
+    mediaUrl    String
+    mediaType   String
+    isHidden    Boolean @default(false)
+
+    createdAt DateTime @default(now())
+}
+
+model PrayerRequest {
+    id       String  @id @default(cuid())
+    fullName String
+    phone    String?
+    email    String?
+    location String?
+    request  String
+
+    status String  @default("PENDING")
+    isRead Boolean @default(false)
+
+    createdAt DateTime @default(now())
+}
+
+model MediaPlaybackEvent {
+    id        String  @id @default(cuid())
+    mediaUrl  String
+    mediaType String
+    context   String?
+    path      String?
+    userAgent String?
+
+    createdAt DateTime @default(now())
+}
+
+model Schedule {
+    id        String @id @default(cuid())
+    title     String
+    day       String
+    startTime String
+    endTime   String
+
+    createdAt DateTime @default(now())
+}
+
+model ProgramListSettings {
+    id                 String   @id
+    heading            String   @default("24-Hour Radio Program List")
+    subheading         String   @default("Wantok Radio Light daily broadcast schedule")
+    timeSlotHeading    String   @default("Time Slot")
+    programHeading     String   @default("Program")
+    contentFocusHeading String  @default("Content Focus")
+
+    updatedAt DateTime @updatedAt
+}
+
+model RadioProgram {
+    id           String  @id @default(cuid())
+    timeSlot     String
+    program      String
+    contentFocus String
+    sortOrder    Int     @default(0)
+    isHidden     Boolean @default(false)
+
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+}
+
+model AuthSession {
+    id         String    @id @default(uuid())
+    userId     String
+    user       User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+    userAgent  String?
+    ipAddress  String?
+    expiresAt  DateTime
+    lastUsedAt DateTime  @default(now())
+    revokedAt  DateTime?
+
+    createdAt DateTime @default(now())
+}
+
+model RefreshToken {
+    id        String    @id @default(uuid())
+    userId    String
+    user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+    token     String    @unique
+    expiresAt DateTime
+    revokedAt DateTime?
+
+    createdAt DateTime @default(now())
+}
+
+model AuditLog {
+    id        String  @id @default(uuid())
+    userId    String?
+    user      User?   @relation(fields: [userId], references: [id], onDelete: SetNull)
+    action    String
+    result    String
+    ipAddress String?
+    userAgent String?
+
+    createdAt DateTime @default(now())
+}
