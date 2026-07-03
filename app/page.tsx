@@ -36,24 +36,44 @@ function getRecentProgramCutoff() {
   return new Date(Date.now() - 48 * 60 * 60 * 1000)
 }
 
+async function getLatestNews() {
+  try {
+    return await prisma.news.findMany({
+      where: { isHidden: false },
+      orderBy: { createdAt: "desc" },
+      take: 4,
+    })
+  } catch (error) {
+    console.error("Failed to load homepage news:", error)
+    return []
+  }
+}
+
+async function getTodaysPrograms(recentProgramCutoff: Date) {
+  try {
+    return await prisma.airwaveContent.findMany({
+      where: {
+        isHidden: false,
+        mediaType: "AUDIO",
+        createdAt: {
+          gte: recentProgramCutoff,
+        },
+      },
+      orderBy: { createdAt: "desc" },
+      take: 4,
+    })
+  } catch (error) {
+    console.error("Failed to load homepage programs:", error)
+    return []
+  }
+}
+
 export default async function HomePage() {
   const recentProgramCutoff = getRecentProgramCutoff()
-  const latestNews = await prisma.news.findMany({
-    where: { isHidden: false },
-    orderBy: { createdAt: "desc" },
-    take: 4,
-  })
-  const todaysPrograms = await prisma.airwaveContent.findMany({
-    where: {
-      isHidden: false,
-      mediaType: "AUDIO",
-      createdAt: {
-        gte: recentProgramCutoff,
-      },
-    },
-    orderBy: { createdAt: "desc" },
-    take: 4,
-  })
+  const [latestNews, todaysPrograms] = await Promise.all([
+    getLatestNews(),
+    getTodaysPrograms(recentProgramCutoff),
+  ])
 
   return (
     <main className="bg-[#003b36] text-white">
