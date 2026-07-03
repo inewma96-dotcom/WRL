@@ -7,11 +7,20 @@ import {
 
 export const dynamic = "force-dynamic"
 
+async function getAirwaveContent() {
+  try {
+    return await prisma.airwaveContent.findMany({
+      where: { isHidden: false, mediaType: "AUDIO" },
+      orderBy: { createdAt: "desc" },
+    })
+  } catch (error) {
+    console.error("Failed to load airwaves page content:", error)
+    return []
+  }
+}
+
 export default async function AirwavesPage() {
-  const content = await prisma.airwaveContent.findMany({
-    where: { isHidden: false, mediaType: "AUDIO" },
-    orderBy: { createdAt: "desc" },
-  })
+  const content = await getAirwaveContent()
   const timeline = groupAirwavesByMonth(content)
 
   return (

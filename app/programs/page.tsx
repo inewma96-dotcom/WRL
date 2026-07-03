@@ -53,25 +53,38 @@ const schedule = [
   { title: "Evening", description: "Bible programs, worship, youth features, and listener favorites.", icon: Music },
 ]
 
+const defaultProgramSettings = {
+  heading: "24-Hour Radio Program List",
+  subheading: "Wantok Radio Light daily broadcast schedule",
+  timeSlotHeading: "Time Slot",
+  programHeading: "Program",
+  contentFocusHeading: "Content Focus",
+}
+
+async function getProgramSchedule() {
+  try {
+    return await Promise.all([
+      prisma.programListSettings.upsert({
+        where: { id: programSettingsId },
+        update: {},
+        create: {
+          id: programSettingsId,
+          ...defaultProgramSettings,
+        },
+      }),
+      prisma.radioProgram.findMany({
+        where: { isHidden: false },
+        orderBy: [{ sortOrder: "asc" }, { createdAt: "asc" }],
+      }),
+    ])
+  } catch (error) {
+    console.error("Failed to load programs page schedule:", error)
+    return [defaultProgramSettings, []] as const
+  }
+}
+
 export default async function ProgramsPage() {
-  const [programSettings, programs] = await Promise.all([
-    prisma.programListSettings.upsert({
-      where: { id: programSettingsId },
-      update: {},
-      create: {
-        id: programSettingsId,
-        heading: "24-Hour Radio Program List",
-        subheading: "Wantok Radio Light daily broadcast schedule",
-        timeSlotHeading: "Time Slot",
-        programHeading: "Program",
-        contentFocusHeading: "Content Focus",
-      },
-    }),
-    prisma.radioProgram.findMany({
-      where: { isHidden: false },
-      orderBy: [{ sortOrder: "asc" }, { createdAt: "asc" }],
-    }),
-  ])
+  const [programSettings, programs] = await getProgramSchedule()
 
   return (
     <main className="bg-[#003b36] text-white">

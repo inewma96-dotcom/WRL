@@ -5,11 +5,20 @@ import { prisma } from "@/lib/prisma"
 export const dynamic = "force-dynamic"
 export const revalidate = 0
 
+async function getPublishedNews() {
+  try {
+    return await prisma.news.findMany({
+      where: { isHidden: false },
+      orderBy: { createdAt: "desc" },
+    })
+  } catch (error) {
+    console.error("Failed to load news page posts:", error)
+    return []
+  }
+}
+
 export default async function NewsPage() {
-  const news = await prisma.news.findMany({
-    where: { isHidden: false },
-    orderBy: { createdAt: "desc" },
-  })
+  const news = await getPublishedNews()
 
   return (
     <main className="min-h-screen bg-[#003b36] text-white">
