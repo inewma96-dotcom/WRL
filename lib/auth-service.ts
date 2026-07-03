@@ -34,9 +34,15 @@ import { isUserRole, type UserRole } from "./constants"
  * In production, these should come from environment variables,
  * NEVER hardcoded defaults
  */
-const JWT_SECRET = process.env.JWT_SECRET || (() => {
-  throw new Error("JWT_SECRET environment variable is required")
-})()
+function getJwtSecret(): string {
+  const secret = process.env.JWT_SECRET
+
+  if (!secret) {
+    throw new Error("JWT_SECRET environment variable is required")
+  }
+
+  return secret
+}
 
 const JWT_ALGORITHM = "HS256"
 const ACCESS_TOKEN_EXPIRY = "8h"
@@ -137,7 +143,7 @@ export function createAccessToken(
       role,
       sessionId,
     } as Omit<JWTPayload, 'iat' | 'exp'>,
-    JWT_SECRET,
+    getJwtSecret(),
     {
       algorithm: JWT_ALGORITHM,
       expiresIn: ACCESS_TOKEN_EXPIRY,
@@ -159,7 +165,7 @@ export function createRefreshToken(
       sessionId,
       type: "refresh", // Mark as refresh token
     },
-    JWT_SECRET,
+    getJwtSecret(),
     {
       algorithm: JWT_ALGORITHM,
       expiresIn: `${REFRESH_TOKEN_EXPIRY_DAYS}d`,
@@ -176,7 +182,7 @@ export function verifyAccessToken(token?: string): JWTPayload | null {
 
     const payload = jwt.verify(
       token,
-      JWT_SECRET,
+      getJwtSecret(),
       {
         algorithms: [JWT_ALGORITHM],
       }
@@ -202,7 +208,7 @@ export function verifyRefreshToken(token?: string): { userId: string; sessionId:
 
     const payload = jwt.verify(
       token,
-      JWT_SECRET,
+      getJwtSecret(),
       {
         algorithms: [JWT_ALGORITHM],
       }
