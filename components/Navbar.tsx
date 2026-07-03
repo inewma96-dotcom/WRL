@@ -3,11 +3,21 @@
 import Image from "next/image"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
+import { Menu, X } from "lucide-react"
+import { useState } from "react"
 import { navLinks } from "@/lib/constants"
-import { Button } from "@/components/ui/button"
 
 export default function Navbar() {
   const pathname = usePathname()
+  const [isOpen, setIsOpen] = useState(false)
+
+  const linkClass = (href: string) => {
+    const isActive = pathname === href
+
+    return `group relative overflow-hidden px-1 py-1 transition-all duration-300 ${
+      isActive ? "text-white" : "text-yellow-400 hover:text-white"
+    }`
+  }
 
   return (
     <nav className="sticky top-0 z-50 w-full border-b border-white/10 bg-[#003b36]/95 text-yellow-400 shadow-lg backdrop-blur-md">
@@ -28,10 +38,17 @@ export default function Navbar() {
           />
         </Link>
 
-        {/* NAV LINKS */}
-        <div className="flex items-center gap-6 text-sm font-semibold">
+        <button
+          type="button"
+          className="inline-flex h-10 w-10 items-center justify-center rounded border border-yellow-300/35 text-yellow-300 transition hover:bg-yellow-300 hover:text-[#003b36] lg:hidden"
+          aria-label={isOpen ? "Close navigation menu" : "Open navigation menu"}
+          aria-expanded={isOpen}
+          onClick={() => setIsOpen((current) => !current)}
+        >
+          {isOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+        </button>
 
-          {/* EXISTING LINKS */}
+        <div className="hidden items-center gap-5 text-sm font-semibold lg:flex">
           {navLinks.map((link) => {
             const isActive = pathname === link.href
 
@@ -39,22 +56,12 @@ export default function Navbar() {
               <Link
                 key={link.name}
                 href={link.href}
-                className={`group relative overflow-hidden px-1 py-1 transition-all duration-300 ${
-                  isActive
-                    ? "text-white"
-                    : "text-yellow-400 hover:text-white"
-                }`}
+                className={linkClass(link.href)}
               >
-                <span className="relative z-10">
-                  {link.name}
-                </span>
-
-                {/* LIGHT SWEEP */}
+                <span className="relative z-10">{link.name}</span>
                 <span className="pointer-events-none absolute inset-0 opacity-0 transition duration-500 group-hover:opacity-100">
                   <span className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent translate-x-[-120%] group-hover:translate-x-[120%] transition-transform duration-700" />
                 </span>
-
-                {/* UNDERLINE */}
                 <span
                   className={`absolute bottom-0 left-0 h-[2px] rounded-full bg-white transition-all duration-300 ${
                     isActive
@@ -65,57 +72,29 @@ export default function Navbar() {
               </Link>
             )
           })}
-
-          {/* PRAYER REQUEST LINK */}
-          <Link
-            href="/prayer-request"
-            className={`group relative overflow-hidden px-1 py-1 transition-all duration-300 ${
-              pathname === "/prayer-request"
-                ? "text-white"
-                : "text-yellow-400 hover:text-white"
-            }`}
-          >
-            <span className="relative z-10">
-              Prayer Request
-            </span>
-
-            {/* LIGHT SWEEP */}
-            <span className="pointer-events-none absolute inset-0 opacity-0 transition duration-500 group-hover:opacity-100">
-              <span className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent translate-x-[-120%] group-hover:translate-x-[120%] transition-transform duration-700" />
-            </span>
-
-            {/* UNDERLINE */}
-            <span
-              className={`absolute bottom-0 left-0 h-[2px] rounded-full bg-white transition-all duration-300 ${
-                pathname === "/prayer-request"
-                  ? "w-full shadow-[0_0_10px_rgba(255,255,255,0.7)]"
-                  : "w-0 group-hover:w-full group-hover:shadow-[0_0_10px_rgba(255,255,255,0.5)]"
-              }`}
-            />
-          </Link>
-
-          {/* DONATE BUTTON */}
-          <Link
-            href="/donate"
-            className="group relative overflow-hidden rounded-xl"
-          >
-            <Button
-              className={`relative z-10 border-0 transition-all duration-300 ${
-                pathname === "/donate"
-                  ? "bg-yellow-500 text-white shadow-lg shadow-yellow-500/40 hover:bg-yellow-400"
-                  : "bg-yellow-500 text-black shadow-md shadow-yellow-500/20 hover:bg-yellow-400 hover:text-white hover:shadow-lg hover:shadow-yellow-500/40"
-              }`}
-            >
-              Donate
-            </Button>
-
-            {/* LIGHT SWEEP */}
-            <span className="pointer-events-none absolute inset-0 opacity-0 transition duration-500 group-hover:opacity-100">
-              <span className="absolute inset-0 bg-gradient-to-r from-transparent via-white/25 to-transparent translate-x-[-120%] group-hover:translate-x-[120%] transition-transform duration-700" />
-            </span>
-          </Link>
         </div>
       </div>
+
+      {isOpen ? (
+        <div className="border-t border-white/10 bg-[#003b36] px-6 py-4 lg:hidden">
+          <div className="mx-auto grid max-w-7xl gap-3 text-sm font-semibold">
+            {navLinks.map((link) => (
+              <Link
+                key={link.name}
+                href={link.href}
+                onClick={() => setIsOpen(false)}
+                className={`rounded px-3 py-2 transition ${
+                  pathname === link.href
+                    ? "bg-yellow-300 text-[#003b36]"
+                    : "text-yellow-300 hover:bg-white/10 hover:text-white"
+                }`}
+              >
+                {link.name}
+              </Link>
+            ))}
+          </div>
+        </div>
+      ) : null}
     </nav>
   )
 }

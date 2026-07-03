@@ -171,3 +171,26 @@
     opacity: 1;
   }
 }
+
+@keyframes program-slide-horizontal {
+  0% {
+    transform: translateX(-24px);
+  }
+  50% {
+    transform: translateX(24px);
+  }
+  100% {
+    transform: translateX(-24px);
+  }
+}
+
+.program-pop-burst {
+  animation: program-slide-horizontal 6s ease-in-out infinite;
+  transform-origin: center;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .program-pop-burst {
+    animation: none;
+  }
+}

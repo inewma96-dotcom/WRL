@@ -84,7 +84,13 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-[#003b36] px-4 py-12">
+    <div
+      className="flex min-h-screen items-center justify-center bg-cover bg-center bg-no-repeat px-4 py-12"
+      style={{
+        backgroundImage:
+          "linear-gradient(rgba(0, 35, 32, 0.55), rgba(0, 35, 32, 0.68)), url('/images/login_bg.png')",
+      }}
+    >
       <div className="w-full max-w-md">
         <div className="mb-8 text-center">
           <Link href="/" className="inline-flex items-center justify-center">

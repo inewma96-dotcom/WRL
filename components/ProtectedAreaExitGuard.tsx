@@ -1,6 +1,6 @@
 "use client"
 
-import { usePathname } from "next/navigation"
+import { usePathname, useRouter } from "next/navigation"
 import { useEffect, useState } from "react"
 
 const PROTECTED_PREFIXES = [
@@ -11,7 +11,7 @@ const PROTECTED_PREFIXES = [
 
 function isProtectedPath(pathname: string) {
   return PROTECTED_PREFIXES.some((prefix) =>
-    pathname.startsWith(prefix)
+    pathname === prefix || pathname.startsWith(`${prefix}/`)
   )
 }
 
@@ -25,6 +25,7 @@ function isPublicPath(pathname: string) {
 
 export default function ProtectedAreaExitGuard() {
   const pathname = usePathname()
+  const router = useRouter()
   const [pendingHref, setPendingHref] =
     useState<string | null>(null)
   const [loggingOut, setLoggingOut] =
@@ -101,6 +102,7 @@ export default function ProtectedAreaExitGuard() {
       return
     }
 
+    const destination = pendingHref
     setLoggingOut(true)
 
     try {
@@ -112,7 +114,9 @@ export default function ProtectedAreaExitGuard() {
     } catch (error) {
       console.error(error)
     } finally {
-      window.location.href = pendingHref
+      setPendingHref(null)
+      setLoggingOut(false)
+      router.push(destination)
     }
   }
 

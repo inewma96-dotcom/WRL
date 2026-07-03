@@ -12,13 +12,14 @@ export function isUserRole(role: string): role is UserRole {
 
 export const navLinks = [
   { name: "Home", href: "/" },
-  { name: "Airwaves", href: "/airwaves" },
+  { name: "About Us", href: "/about" },
+  { name: "Programs", href: "/programs" },
   { name: "Coverage", href: "/coverage" },
   { name: "Projects", href: "/projects" },
-  { name: "About Us", href: "/about" },
+  { name: "Partners", href: "/partners" },
+  { name: "News & Updates", href: "/news" },
+  { name: "Support Us", href: "/support-us" },
   { name: "Contact", href: "/contact" },
-  { name: "News", href: "/news" }, // ✅ NEW
-  { name: "Partners", href: "/partners" }, // ✅ moved near donate
 ]
 
 export const programsList = [

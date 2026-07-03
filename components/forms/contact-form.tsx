@@ -63,7 +63,7 @@ export default function ContactForm() {
   }
 
   return (
-    <div className="rounded-2xl border bg-white p-8 shadow-sm">
+    <div className="rounded-lg border border-black/10 bg-white/90 p-6 text-[#071512] shadow-[0_24px_70px_rgba(0,0,0,0.18)] md:p-8">
       <form onSubmit={handleSubmit} className="space-y-6">
         <div className="grid gap-6 md:grid-cols-2">
           <div>
@@ -77,7 +77,7 @@ export default function ContactForm() {
               placeholder="Enter your name"
               value={formData.name}
               onChange={handleChange}
-              className="w-full rounded-xl border px-4 py-3 outline-none focus:ring-2 focus:ring-yellow-500"
+              className="w-full rounded border border-black/15 px-4 py-3 outline-none focus:ring-2 focus:ring-yellow-500"
               required
             />
           </div>
@@ -93,7 +93,7 @@ export default function ContactForm() {
               placeholder="Enter your email"
               value={formData.email}
               onChange={handleChange}
-              className="w-full rounded-xl border px-4 py-3 outline-none focus:ring-2 focus:ring-yellow-500"
+              className="w-full rounded border border-black/15 px-4 py-3 outline-none focus:ring-2 focus:ring-yellow-500"
               required
             />
           </div>
@@ -110,7 +110,7 @@ export default function ContactForm() {
             placeholder="Enter subject"
             value={formData.subject}
             onChange={handleChange}
-            className="w-full rounded-xl border px-4 py-3 outline-none focus:ring-2 focus:ring-yellow-500"
+            className="w-full rounded border border-black/15 px-4 py-3 outline-none focus:ring-2 focus:ring-yellow-500"
             required
           />
         </div>
@@ -126,7 +126,7 @@ export default function ContactForm() {
             placeholder="Write your message"
             value={formData.message}
             onChange={handleChange}
-            className="w-full rounded-xl border px-4 py-3 outline-none focus:ring-2 focus:ring-yellow-500"
+            className="w-full rounded border border-black/15 px-4 py-3 outline-none focus:ring-2 focus:ring-yellow-500"
             required
           />
         </div>
@@ -146,7 +146,7 @@ export default function ContactForm() {
         <button
           type="submit"
           disabled={loading}
-          className="rounded-xl bg-yellow-500 px-6 py-3 font-bold text-black hover:bg-yellow-400 disabled:cursor-not-allowed disabled:opacity-70"
+          className="rounded bg-yellow-400 px-6 py-3 font-black uppercase tracking-normal text-black transition hover:-translate-y-1 hover:bg-[#071512] hover:text-white disabled:cursor-not-allowed disabled:opacity-70"
         >
           {loading ? "Sending..." : "Send Message"}
         </button>
