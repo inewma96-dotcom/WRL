@@ -2,6 +2,7 @@ import "./globals.css"
 import { AuthProvider } from "@/lib/auth-context"
 import MediaPlaybackGuard from "@/components/MediaPlaybackGuard"
 import ProtectedAreaExitGuard from "@/components/ProtectedAreaExitGuard"
+import RouteFadeTransition from "@/components/RouteFadeTransition"
 import SiteChrome from "@/components/SiteChrome"
 import SiteFooter from "@/components/SiteFooter"
 
@@ -16,11 +17,14 @@ export default function RootLayout({
         <AuthProvider>
           <MediaPlaybackGuard />
           <ProtectedAreaExitGuard />
-          <SiteChrome />
 
-          {children}
+          <RouteFadeTransition>
+            <SiteChrome />
 
-          <SiteFooter />
+            {children}
+
+            <SiteFooter />
+          </RouteFadeTransition>
         </AuthProvider>
       </body>
     </html>

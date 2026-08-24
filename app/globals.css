@@ -126,8 +126,83 @@
   * {
     @apply border-border outline-ring/50;
   }
+  html {
+    scrollbar-gutter: stable;
+    scroll-behavior: auto;
+  }
   body {
-    @apply bg-background text-foreground;
+    @apply bg-[#061712] text-foreground antialiased;
+    text-rendering: optimizeLegibility;
+  }
+  ::selection {
+    @apply bg-yellow-300 text-[#071512];
+  }
+  a,
+  button,
+  input,
+  textarea,
+  select {
+    @apply outline-none focus-visible:ring-2 focus-visible:ring-yellow-300/80 focus-visible:ring-offset-2 focus-visible:ring-offset-[#071512];
+  }
+}
+
+@layer utilities {
+  .wrl-shell {
+    @apply mx-auto w-full max-w-7xl px-5 sm:px-6 lg:px-8;
+  }
+
+  .wrl-section {
+    @apply px-5 py-16 sm:px-6 md:py-20 lg:px-8 lg:py-24;
+  }
+
+  .wrl-surface {
+    @apply border border-white/12 bg-white/[0.065] shadow-[0_22px_70px_rgba(0,0,0,0.22)] backdrop-blur-sm;
+  }
+
+  .wrl-surface-light {
+    @apply border border-[#071512]/10 bg-white shadow-[0_18px_48px_rgba(7,21,18,0.12)];
+  }
+
+  .wrl-premium-grid {
+    background-image:
+      linear-gradient(rgba(255,255,255,0.045) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255,255,255,0.045) 1px, transparent 1px);
+    background-size: 44px 44px;
+    mask-image: linear-gradient(to bottom, black, transparent 82%);
+  }
+
+  .wrl-button-primary {
+    @apply inline-flex min-h-11 items-center justify-center gap-2 rounded-md bg-yellow-300 px-5 py-3 text-sm font-black uppercase tracking-normal text-[#071512] shadow-[0_14px_32px_rgba(250,204,21,0.22)] transition duration-300 hover:-translate-y-0.5 hover:bg-white hover:shadow-[0_18px_44px_rgba(255,255,255,0.15)] active:translate-y-0 disabled:cursor-not-allowed disabled:opacity-60;
+  }
+
+  .wrl-button-secondary {
+    @apply inline-flex min-h-11 items-center justify-center gap-2 rounded-md border border-white/35 px-5 py-3 text-sm font-black uppercase tracking-normal text-white transition duration-300 hover:-translate-y-0.5 hover:border-yellow-300 hover:bg-yellow-300/10 hover:text-yellow-200 active:translate-y-0 disabled:cursor-not-allowed disabled:opacity-60;
+  }
+}
+
+.route-fade-content {
+  opacity: 1;
+  transition: opacity 180ms ease;
+}
+
+.route-fade-out {
+  overflow: hidden;
+}
+
+.route-fade-out .route-fade-content {
+  opacity: 0;
+}
+
+.route-fade-in .route-fade-content {
+  animation: routeFadeIn 180ms ease both;
+}
+
+@keyframes routeFadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
   }
 }
 
@@ -190,6 +265,15 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+
   .program-pop-burst {
     animation: none;
   }

@@ -1,6 +1,8 @@
 import Link from "next/link"
 import { BookOpen, Globe2, Headphones, Radio, RadioTower, Smartphone, Users } from "lucide-react"
 import AirwaveAudioCard from "@/components/AirwaveAudioCard"
+import FacebookPageSection from "@/components/FacebookPageSection"
+import HomeProgramTabs from "@/components/HomeProgramTabs"
 import NewsUpdateCard from "@/components/NewsUpdateCard"
 import { CTASection, InfoCard, LightCard, PageHero, SectionHeading } from "@/components/sections/PublicPageSections"
 import { formatAirwavesPostTime } from "@/lib/airwaves-timeline"
@@ -9,13 +11,34 @@ import { prisma } from "@/lib/prisma"
 export const dynamic = "force-dynamic"
 export const revalidate = 0
 
-const featuredPrograms = [
-  "Belo-Taim Devotion",
-  "Story Bilong Mi",
-  "Praying For The Nation",
-  "Sunday Service",
-  "Focus on the Family",
-  "Back to the Bible",
+const localPrograms = [
+  {
+    title: "Belo-Taim Devotion",
+    description: "A midday devotion that gives listeners a quiet pause for Scripture, prayer, and encouragement during the day.",
+  },
+  {
+    title: "Story Bilong Mi",
+    description: "Local testimonies and life stories from PNG voices, sharing how faith brings hope through real experiences.",
+  },
+  {
+    title: "Praying For The Nation",
+    description: "A daily prayer focus lifting Papua New Guinea, its leaders, churches, families, and communities before God.",
+  },
+]
+
+const internationalPrograms = [
+  {
+    title: "Focus on the Family",
+    description: "Trusted Christian teaching for marriage, parenting, relationships, and building stronger family life.",
+  },
+  {
+    title: "Back to the Bible",
+    description: "Clear Bible teaching that helps listeners understand Scripture and apply God's Word in everyday life.",
+  },
+  {
+    title: "Leading The Way",
+    description: "International Bible teaching that encourages listeners to follow Christ with courage, clarity, and hope.",
+  },
 ]
 
 const impact = [
@@ -83,19 +106,14 @@ export default async function HomePage() {
         description="Reaching Papua New Guinea with the love of Jesus Christ through the airwaves."
         image="/images/hero.jpg"
         actions={[
-          { label: "View Programs", href: "/programs" },
+          {
+            label: "Today's Playout",
+            href: "/airwaves",
+            title: "Click here to visit our daily programs that has being played out aready",
+            variant: "primary",
+          },
         ]}
-      >
-        <div className="program-pop-burst max-w-5xl rounded-lg border-4 border-yellow-400 bg-[#003b36]/78 px-5 py-5 text-center shadow-[0_22px_70px_rgba(0,0,0,0.35)] backdrop-blur-sm md:px-8 md:py-6">
-          <p className="text-lg font-black leading-8 text-white md:text-2xl md:leading-10">
-            Did you miss out on your favourite program? Visit{" "}
-            <Link href="/airwaves" className="text-yellow-300 underline decoration-2 underline-offset-4 transition hover:text-white">
-              today&apos;s program
-            </Link>{" "}
-            to play your favourite program and stay connected with Wantok Radio Light.
-          </p>
-        </div>
-      </PageHero>
+      />
 
       <section className="bg-[#071512] px-6 py-20">
         <div className="mx-auto grid max-w-6xl gap-8 lg:grid-cols-[0.85fr_1.15fr] lg:items-center">
@@ -125,17 +143,7 @@ export default async function HomePage() {
             title="Programs that inspire, encourage, and transform lives"
             description="A mix of local PNG voices and trusted international Christian programs for daily listening."
           />
-          <div className="mt-12 grid gap-5 md:grid-cols-2 xl:grid-cols-3">
-            {featuredPrograms.map((program) => (
-              <InfoCard
-                key={program}
-                title={program}
-                eyebrow="On Air"
-                description="Faith-filled radio content prepared to encourage listeners and point families to Christ."
-                icon={BookOpen}
-              />
-            ))}
-          </div>
+          <HomeProgramTabs localPrograms={localPrograms} internationalPrograms={internationalPrograms} />
         </div>
       </section>
 
@@ -250,6 +258,8 @@ export default async function HomePage() {
           </div>
         </div>
       </section>
+
+      <FacebookPageSection />
     </main>
   )
 }
