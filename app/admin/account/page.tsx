@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useMemo, useState } from "react"
+import { useCallback, useEffect, useMemo, useState } from "react"
 import { Edit3, Eye, EyeOff, KeyRound, Plus, Save, Trash2, X } from "lucide-react"
 
 import { USER_ROLES, type UserRole } from "@/lib/constants"
@@ -44,7 +44,7 @@ export default function AdminAccountPage() {
     [accounts, editingId]
   )
 
-  async function loadAccounts() {
+  const loadAccounts = useCallback(async () => {
     setLoading(true)
     setError(null)
 
@@ -65,11 +65,13 @@ export default function AdminAccountPage() {
     } finally {
       setLoading(false)
     }
-  }
+  }, [])
 
   useEffect(() => {
-    loadAccounts()
-  }, [])
+    window.setTimeout(() => {
+      loadAccounts()
+    }, 0)
+  }, [loadAccounts])
 
   function resetForm() {
     setForm(emptyForm)

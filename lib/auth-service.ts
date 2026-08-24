@@ -79,6 +79,29 @@ export interface JWTPayload {
   exp: number
 }
 
+interface RefreshTokenPayload {
+  userId: string
+  sessionId: string
+  type: "refresh"
+}
+
+interface JwtExpiryPayload {
+  exp: number
+}
+
+function hasJwtExpiry(payload: unknown): payload is JwtExpiryPayload {
+  return Boolean(payload && typeof payload === "object" && !Array.isArray(payload) && typeof (payload as { exp?: unknown }).exp === "number")
+}
+
+function isRefreshTokenPayload(payload: unknown): payload is RefreshTokenPayload {
+  if (!payload || typeof payload !== "object" || Array.isArray(payload)) {
+    return false
+  }
+
+  const candidate = payload as Partial<Record<keyof RefreshTokenPayload, unknown>>
+  return candidate.type === "refresh" && typeof candidate.userId === "string" && typeof candidate.sessionId === "string"
+}
+
 /**
  * Session Data
  * What's stored in the database for each active session
@@ -212,9 +235,9 @@ export function verifyRefreshToken(token?: string): { userId: string; sessionId:
       {
         algorithms: [JWT_ALGORITHM],
       }
-    ) as any
+    )
 
-    if (payload.type !== "refresh" || !payload.userId || !payload.sessionId) {
+    if (!isRefreshTokenPayload(payload)) {
       return null
     }
 
@@ -393,7 +416,10 @@ export async function loginUser(
     await logAuditEvent(user.id, "LOGIN", "SUCCESS", ipAddress, userAgent)
 
     // Calculate expiry
-    const decoded = jwt.decode(accessToken) as any
+    const decoded = jwt.decode(accessToken)
+    if (!hasJwtExpiry(decoded)) {
+      throw new Error("Invalid access token expiry")
+    }
     const expiresIn = decoded.exp - Math.floor(Date.now() / 1000)
 
     return {
@@ -480,7 +506,10 @@ export async function refreshAccessToken(
     sessionId
   )
 
-  const decoded2 = jwt.decode(newAccessToken) as any
+  const decoded2 = jwt.decode(newAccessToken)
+  if (!hasJwtExpiry(decoded2)) {
+    throw new Error("Invalid access token expiry")
+  }
   const expiresIn = decoded2.exp - Math.floor(Date.now() / 1000)
 
   // Audit log
@@ -525,15 +554,15 @@ async function logAuditEvent(
         data: {
           userId,
           action,
-          result: status,
+          result: error ? `${status}: ${error}` : status,
           ipAddress,
           userAgent,
         },
       })
     }
-  } catch (e) {
+  } catch (error) {
     // Silently fail - don't let audit logging break auth
-    console.error("Audit log error:", e)
+    console.error("Audit log error:", error)
   }
 }
 

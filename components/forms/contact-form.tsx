@@ -63,11 +63,11 @@ export default function ContactForm() {
   }
 
   return (
-    <div className="rounded-lg border border-black/10 bg-white/90 p-6 text-[#071512] shadow-[0_24px_70px_rgba(0,0,0,0.18)] md:p-8">
-      <form onSubmit={handleSubmit} className="space-y-6">
-        <div className="grid gap-6 md:grid-cols-2">
+    <div className="rounded-lg border border-[#071512]/10 bg-white p-6 text-[#071512] shadow-[0_24px_70px_rgba(7,21,18,0.16)] md:p-8">
+      <form onSubmit={handleSubmit} className="space-y-5">
+        <div className="grid gap-5 md:grid-cols-2">
           <div>
-            <label htmlFor="name" className="mb-2 block text-sm font-semibold">
+            <label htmlFor="name" className="mb-2 block text-sm font-black">
               Name
             </label>
             <input
@@ -77,13 +77,13 @@ export default function ContactForm() {
               placeholder="Enter your name"
               value={formData.name}
               onChange={handleChange}
-              className="w-full rounded border border-black/15 px-4 py-3 outline-none focus:ring-2 focus:ring-yellow-500"
+              className="h-12 w-full rounded-md border border-[#071512]/15 bg-[#f8f6ef]/70 px-4 text-sm outline-none transition focus:border-[#082b52] focus:bg-white focus:ring-2 focus:ring-yellow-400/70"
               required
             />
           </div>
 
           <div>
-            <label htmlFor="email" className="mb-2 block text-sm font-semibold">
+            <label htmlFor="email" className="mb-2 block text-sm font-black">
               Email
             </label>
             <input
@@ -93,14 +93,14 @@ export default function ContactForm() {
               placeholder="Enter your email"
               value={formData.email}
               onChange={handleChange}
-              className="w-full rounded border border-black/15 px-4 py-3 outline-none focus:ring-2 focus:ring-yellow-500"
+              className="h-12 w-full rounded-md border border-[#071512]/15 bg-[#f8f6ef]/70 px-4 text-sm outline-none transition focus:border-[#082b52] focus:bg-white focus:ring-2 focus:ring-yellow-400/70"
               required
             />
           </div>
         </div>
 
         <div>
-          <label htmlFor="subject" className="mb-2 block text-sm font-semibold">
+          <label htmlFor="subject" className="mb-2 block text-sm font-black">
             Subject
           </label>
           <input
@@ -110,13 +110,13 @@ export default function ContactForm() {
             placeholder="Enter subject"
             value={formData.subject}
             onChange={handleChange}
-            className="w-full rounded border border-black/15 px-4 py-3 outline-none focus:ring-2 focus:ring-yellow-500"
+            className="h-12 w-full rounded-md border border-[#071512]/15 bg-[#f8f6ef]/70 px-4 text-sm outline-none transition focus:border-[#082b52] focus:bg-white focus:ring-2 focus:ring-yellow-400/70"
             required
           />
         </div>
 
         <div>
-          <label htmlFor="message" className="mb-2 block text-sm font-semibold">
+          <label htmlFor="message" className="mb-2 block text-sm font-black">
             Message
           </label>
           <textarea
@@ -126,19 +126,19 @@ export default function ContactForm() {
             placeholder="Write your message"
             value={formData.message}
             onChange={handleChange}
-            className="w-full rounded border border-black/15 px-4 py-3 outline-none focus:ring-2 focus:ring-yellow-500"
+            className="w-full rounded-md border border-[#071512]/15 bg-[#f8f6ef]/70 px-4 py-3 text-sm outline-none transition focus:border-[#082b52] focus:bg-white focus:ring-2 focus:ring-yellow-400/70"
             required
           />
         </div>
 
         {successMessage && (
-          <p className="rounded-lg bg-green-50 px-4 py-3 text-sm text-green-700">
+          <p className="rounded-md border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm font-semibold text-emerald-800">
             {successMessage}
           </p>
         )}
 
         {errorMessage && (
-          <p className="rounded-lg bg-red-50 px-4 py-3 text-sm text-red-700">
+          <p className="rounded-md border border-red-200 bg-red-50 px-4 py-3 text-sm font-semibold text-red-800">
             {errorMessage}
           </p>
         )}
@@ -146,7 +146,7 @@ export default function ContactForm() {
         <button
           type="submit"
           disabled={loading}
-          className="rounded bg-yellow-400 px-6 py-3 font-black uppercase tracking-normal text-black transition hover:-translate-y-1 hover:bg-[#071512] hover:text-white disabled:cursor-not-allowed disabled:opacity-70"
+          className="inline-flex min-h-11 items-center justify-center rounded-md bg-yellow-300 px-6 py-3 text-sm font-black uppercase tracking-normal text-[#071512] shadow-[0_14px_32px_rgba(250,204,21,0.2)] transition hover:-translate-y-0.5 hover:bg-[#071512] hover:text-white disabled:cursor-not-allowed disabled:opacity-70"
         >
           {loading ? "Sending..." : "Send Message"}
         </button>

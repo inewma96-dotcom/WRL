@@ -93,6 +93,10 @@ export default function AdminLayout({
     { name: "Airwaves", href: "/admin/airwaves" },
     { name: "News", href: "/admin/news" },
     { name: "Programs", href: "/admin/programs" },
+    { name: "Payments", href: "/admin/payments" },
+    { name: "Donations", href: "/admin/donations" },
+    { name: "Orders", href: "/admin/orders" },
+    { name: "Payment Settings", href: "/admin/payment-settings" },
     { name: "Account", href: "/admin/account" },
   ]
 

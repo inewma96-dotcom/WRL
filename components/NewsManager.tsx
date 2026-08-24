@@ -27,9 +27,25 @@ export default function NewsManager({
   const [content, setContent] = useState("")
   const [file, setFile] = useState<File | null>(null)
   const [editingId, setEditingId] = useState<string | null>(null)
+  const [message, setMessage] = useState<{ type: "error" | "success"; text: string } | null>(null)
+  const [saving, setSaving] = useState(false)
+
+  const readErrorMessage = async (res: Response, fallback: string) => {
+    try {
+      const data = await res.json()
+      return data?.error || data?.message || fallback
+    } catch {
+      return fallback
+    }
+  }
 
   const fetchNews = useCallback(async () => {
-    const res = await fetch("/api/news/list")
+    const res = await fetch("/api/news/list", { credentials: "include" })
+    if (!res.ok) {
+      setMessage({ type: "error", text: await readErrorMessage(res, "Failed to load news") })
+      return
+    }
+
     const data = await res.json()
     setNews(Array.isArray(data) ? data : [])
   }, [])
@@ -54,46 +70,64 @@ export default function NewsManager({
   }
 
   const handleSave = async () => {
+    setMessage(null)
+
+    if (!title.trim()) {
+      setMessage({ type: "error", text: "Title is required" })
+      return
+    }
+
+    setSaving(true)
+
     if (editingId) {
       const res = await fetch("/api/news/update", {
         method: "PATCH",
+        credentials: "include",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ id: editingId, title, content }),
       })
 
       if (!res.ok) {
-        alert("Update failed")
+        setMessage({ type: "error", text: await readErrorMessage(res, "Update failed") })
+        setSaving(false)
         return
       }
 
       await fetchNews()
       resetForm()
+      setMessage({ type: "success", text: "News updated successfully" })
+      setSaving(false)
       return
     }
-
-    if (!file) return alert("File required")
 
     const formData = new FormData()
     formData.append("title", title)
     formData.append("content", content)
-    formData.append("file", file)
+    if (file) {
+      formData.append("file", file)
+    }
 
     const res = await fetch("/api/news/upload", {
       method: "POST",
+      credentials: "include",
       body: formData,
     })
 
     if (res.ok) {
       await fetchNews()
       resetForm()
+      setMessage({ type: "success", text: "News posted successfully" })
     } else {
-      alert("Upload failed")
+      setMessage({ type: "error", text: await readErrorMessage(res, "Upload failed") })
     }
+
+    setSaving(false)
   }
 
   const handleDelete = async (id: string) => {
     await fetch("/api/news/delete", {
       method: "DELETE",
+      credentials: "include",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ id }),
     })
@@ -103,6 +137,7 @@ export default function NewsManager({
   const toggleHide = async (id: string) => {
     await fetch("/api/news/hide", {
       method: "PATCH",
+      credentials: "include",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ id }),
     })
@@ -114,6 +149,18 @@ export default function NewsManager({
       <h1 className="mb-4 text-xl font-bold text-yellow-400">{heading}</h1>
 
       <div className="mb-10 rounded-xl bg-black/40 p-6">
+        {message && (
+          <div
+            className={`mb-4 rounded-lg border px-4 py-3 text-sm font-semibold ${
+              message.type === "error"
+                ? "border-red-400/50 bg-red-500/15 text-red-100"
+                : "border-emerald-400/50 bg-emerald-500/15 text-emerald-100"
+            }`}
+          >
+            {message.text}
+          </div>
+        )}
+
         <input
           placeholder="Title"
           value={title}
@@ -131,6 +178,7 @@ export default function NewsManager({
         {!editingId && (
           <input
             type="file"
+            accept="image/*,video/mp4,video/webm,video/quicktime"
             onChange={(e) => setFile(e.target.files?.[0] || null)}
             className="mb-4 block"
           />
@@ -139,9 +187,10 @@ export default function NewsManager({
         <div className="flex flex-wrap gap-3">
           <button
             onClick={handleSave}
+            disabled={saving}
             className="rounded bg-blue-500 px-6 py-2 font-semibold transition hover:bg-blue-400"
           >
-            {editingId ? "Save Changes" : "Post"}
+            {saving ? "Saving..." : editingId ? "Save Changes" : "Post"}
           </button>
 
           {editingId && (

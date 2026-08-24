@@ -64,6 +64,23 @@ export interface EdgeJWTPayload {
   exp: number
 }
 
+function isEdgeJwtPayload(payload: unknown): payload is EdgeJWTPayload {
+  if (!payload || typeof payload !== "object" || Array.isArray(payload)) {
+    return false
+  }
+
+  const candidate = payload as Partial<Record<keyof EdgeJWTPayload, unknown>>
+
+  return (
+    typeof candidate.userId === "string" &&
+    typeof candidate.email === "string" &&
+    typeof candidate.role === "string" &&
+    isUserRole(candidate.role) &&
+    typeof candidate.sessionId === "string" &&
+    typeof candidate.exp === "number"
+  )
+}
+
 export async function verifyAccessTokenEdge(
   token: string,
   secret: string
@@ -91,21 +108,11 @@ export async function verifyAccessTokenEdge(
     return null
   }
 
-  if (
-    !payload ||
-    typeof payload !== "object" ||
-    Array.isArray(payload) ||
-    typeof (payload as any).userId !== "string" ||
-    typeof (payload as any).email !== "string" ||
-    typeof (payload as any).role !== "string" ||
-    !isUserRole((payload as any).role) ||
-    typeof (payload as any).sessionId !== "string" ||
-    typeof (payload as any).exp !== "number"
-  ) {
+  if (!isEdgeJwtPayload(payload)) {
     return null
   }
 
-  if ((payload as any).exp < Math.floor(Date.now() / 1000)) {
+  if (payload.exp < Math.floor(Date.now() / 1000)) {
     return null
   }
 
@@ -114,5 +121,5 @@ export async function verifyAccessTokenEdge(
     return null
   }
 
-  return payload as EdgeJWTPayload
+  return payload
 }

@@ -116,7 +116,7 @@ export default function AirwaveAudioCard({
 
   return (
     <article
-      className={`group overflow-hidden rounded-xl border bg-black/40 shadow-lg transition duration-500 hover:-translate-y-2 hover:scale-[1.03] hover:border-yellow-300/80 hover:bg-[#003b36]/95 hover:shadow-[0_24px_55px_rgba(0,0,0,0.45)] ${
+      className={`group overflow-hidden rounded-lg border bg-black/40 shadow-[0_16px_44px_rgba(0,0,0,0.22)] transition duration-500 hover:-translate-y-1.5 hover:border-yellow-300/70 hover:bg-[#003b36]/95 hover:shadow-[0_24px_55px_rgba(0,0,0,0.36)] ${
         isPlaying
           ? "border-yellow-300/90 shadow-[0_0_32px_rgba(250,204,21,0.22)]"
           : "border-yellow-300/20"
@@ -185,7 +185,7 @@ export default function AirwaveAudioCard({
               <button
                 type="button"
                 onClick={togglePlay}
-                className="grid h-11 w-11 shrink-0 place-items-center rounded-full bg-yellow-300 text-[#003b36] shadow-[0_12px_30px_rgba(250,204,21,0.25)] transition hover:scale-110 hover:bg-yellow-200"
+                className="grid h-11 w-11 shrink-0 place-items-center rounded-full bg-yellow-300 text-[#003b36] shadow-[0_12px_30px_rgba(250,204,21,0.25)] transition hover:scale-105 hover:bg-yellow-200"
                 aria-label={isPlaying ? "Pause audio" : "Play audio"}
               >
                 {isPlaying ? (

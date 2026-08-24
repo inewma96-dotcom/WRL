@@ -1,150 +1,361 @@
 generator client {
-    provider = "prisma-client-js"
+  provider = "prisma-client-js"
 }
 
 datasource db {
-    provider = "sqlite"
-    url      = "file:./dev.db"
+  provider = "sqlite"
+  url      = "file:./dev.db"
 }
 
 model User {
-    id              String  @id @default(uuid())
-    email           String  @unique
-    username        String? @unique
-    password        String
-    displayName     String?
-    displayPassword String?
-    role            String  @default("ADMIN")
-    status          String  @default("ACTIVE")
+  id              String  @id @default(uuid())
+  email           String  @unique
+  username        String? @unique
+  password        String
+  displayName     String?
+  displayPassword String?
+  role            String  @default("ADMIN")
+  status          String  @default("ACTIVE")
 
-    // Auth fields
-    lastLoginAt DateTime?
-    lastLoginIp String?
+  // Auth fields
+  lastLoginAt DateTime?
+  lastLoginIp String?
 
-    // Relations
-    news          News[]
-    authSessions  AuthSession[]
-    refreshTokens RefreshToken[]
-    auditLogs     AuditLog[]
+  // Relations
+  news          News[]
+  authSessions  AuthSession[]
+  refreshTokens RefreshToken[]
+  auditLogs     AuditLog[]
 
-    createdAt DateTime @default(now())
+  paymentCustomers PaymentCustomer[]
+  paymentOrders    PaymentOrder[]
+  paymentRefunds   PaymentRefund[]
+  paymentAuditLogs PaymentAuditLog[]
+
+  createdAt DateTime @default(now())
 }
 
 model News {
-    id        String  @id @default(cuid())
-    title     String
-    content   String
-    mediaUrl  String?
-    mediaType String?
-    isHidden  Boolean @default(false)
+  id        String  @id @default(cuid())
+  title     String
+  content   String
+  mediaUrl  String?
+  mediaType String?
+  isHidden  Boolean @default(false)
 
-    authorId String?
-    author   User?   @relation(fields: [authorId], references: [id])
+  authorId String?
+  author   User?   @relation(fields: [authorId], references: [id])
 
-    createdAt DateTime @default(now())
+  createdAt DateTime @default(now())
 }
 
 model AirwaveContent {
-    id          String  @id @default(cuid())
-    title       String
-    description String?
-    mediaUrl    String
-    mediaType   String
-    isHidden    Boolean @default(false)
+  id          String  @id @default(cuid())
+  title       String
+  description String?
+  mediaUrl    String
+  mediaType   String
+  isHidden    Boolean @default(false)
 
-    createdAt DateTime @default(now())
+  createdAt DateTime @default(now())
 }
 
 model PrayerRequest {
-    id       String  @id @default(cuid())
-    fullName String
-    phone    String?
-    email    String?
-    location String?
-    request  String
+  id       String  @id @default(cuid())
+  fullName String
+  phone    String?
+  email    String?
+  location String?
+  request  String
 
-    status String  @default("PENDING")
-    isRead Boolean @default(false)
+  status String  @default("PENDING")
+  isRead Boolean @default(false)
 
-    createdAt DateTime @default(now())
+  createdAt DateTime @default(now())
 }
 
 model MediaPlaybackEvent {
-    id        String  @id @default(cuid())
-    mediaUrl  String
-    mediaType String
-    context   String?
-    path      String?
-    userAgent String?
+  id        String  @id @default(cuid())
+  mediaUrl  String
+  mediaType String
+  context   String?
+  path      String?
+  userAgent String?
 
-    createdAt DateTime @default(now())
+  createdAt DateTime @default(now())
 }
 
 model Schedule {
-    id        String @id @default(cuid())
-    title     String
-    day       String
-    startTime String
-    endTime   String
+  id        String @id @default(cuid())
+  title     String
+  day       String
+  startTime String
+  endTime   String
 
-    createdAt DateTime @default(now())
+  createdAt DateTime @default(now())
 }
 
 model ProgramListSettings {
-    id                 String   @id
-    heading            String   @default("24-Hour Radio Program List")
-    subheading         String   @default("Wantok Radio Light daily broadcast schedule")
-    timeSlotHeading    String   @default("Time Slot")
-    programHeading     String   @default("Program")
-    contentFocusHeading String  @default("Content Focus")
+  id                  String @id
+  heading             String @default("24-Hour Radio Program List")
+  subheading          String @default("Wantok Radio Light daily broadcast schedule")
+  timeSlotHeading     String @default("Time Slot")
+  programHeading      String @default("Program")
+  contentFocusHeading String @default("Content Focus")
 
-    updatedAt DateTime @updatedAt
+  updatedAt DateTime @updatedAt
 }
 
 model RadioProgram {
-    id           String  @id @default(cuid())
-    timeSlot     String
-    program      String
-    contentFocus String
-    sortOrder    Int     @default(0)
-    isHidden     Boolean @default(false)
+  id           String  @id @default(cuid())
+  timeSlot     String
+  program      String
+  contentFocus String
+  sortOrder    Int     @default(0)
+  isHidden     Boolean @default(false)
 
-    createdAt DateTime @default(now())
-    updatedAt DateTime @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 model AuthSession {
-    id         String    @id @default(uuid())
-    userId     String
-    user       User      @relation(fields: [userId], references: [id], onDelete: Cascade)
-    userAgent  String?
-    ipAddress  String?
-    expiresAt  DateTime
-    lastUsedAt DateTime  @default(now())
-    revokedAt  DateTime?
+  id         String    @id @default(uuid())
+  userId     String
+  user       User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userAgent  String?
+  ipAddress  String?
+  expiresAt  DateTime
+  lastUsedAt DateTime  @default(now())
+  revokedAt  DateTime?
 
-    createdAt DateTime @default(now())
+  createdAt DateTime @default(now())
 }
 
 model RefreshToken {
-    id        String    @id @default(uuid())
-    userId    String
-    user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
-    token     String    @unique
-    expiresAt DateTime
-    revokedAt DateTime?
+  id        String    @id @default(uuid())
+  userId    String
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  token     String    @unique
+  expiresAt DateTime
+  revokedAt DateTime?
 
-    createdAt DateTime @default(now())
+  createdAt DateTime @default(now())
 }
 
 model AuditLog {
-    id        String  @id @default(uuid())
-    userId    String?
-    user      User?   @relation(fields: [userId], references: [id], onDelete: SetNull)
-    action    String
-    result    String
-    ipAddress String?
-    userAgent String?
+  id        String  @id @default(uuid())
+  userId    String?
+  user      User?   @relation(fields: [userId], references: [id], onDelete: SetNull)
+  action    String
+  result    String
+  ipAddress String?
+  userAgent String?
 
-    createdAt DateTime @default(now())
+  createdAt DateTime @default(now())
+}
+
+model PaymentProduct {
+  id                 String  @id @default(cuid())
+  publicId           String  @unique
+  name               String
+  slug               String  @unique
+  description        String?
+  paymentPurpose     String
+  priceMinor         Int?
+  currency           String  @default("PGK")
+  allowCustomAmount  Boolean @default(false)
+  minimumAmountMinor Int?
+  maximumAmountMinor Int?
+  imageUrl           String?
+  isActive           Boolean @default(true)
+
+  orderItems PaymentOrderItem[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model PaymentCustomer {
+  id             String  @id @default(cuid())
+  publicId       String  @unique
+  userId         String?
+  user           User?   @relation(fields: [userId], references: [id], onDelete: SetNull)
+  fullName       String
+  email          String
+  phone          String?
+  country        String?
+  province       String?
+  city           String?
+  postalCode     String?
+  billingAddress String?
+
+  orders PaymentOrder[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([email])
+  @@index([userId])
+}
+
+model PaymentOrder {
+  id                 String          @id @default(cuid())
+  publicReference    String          @unique
+  userId             String?
+  user               User?           @relation(fields: [userId], references: [id], onDelete: SetNull)
+  customerId         String
+  customer           PaymentCustomer @relation(fields: [customerId], references: [id], onDelete: Restrict)
+  status             String          @default("DRAFT")
+  purpose            String
+  currency           String          @default("PGK")
+  subtotalMinor      Int
+  processingFeeMinor Int             @default(0)
+  totalMinor         Int
+  description        String
+  notes              String?
+  metadata           String?
+  paidAt             DateTime?
+  cancelledAt        DateTime?
+
+  items        PaymentOrderItem[]
+  transactions PaymentTransaction[]
+  auditLogs    PaymentAuditLog[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([status])
+  @@index([purpose])
+  @@index([customerId])
+  @@index([createdAt])
+}
+
+model PaymentOrderItem {
+  id                  String          @id @default(cuid())
+  orderId             String
+  order               PaymentOrder    @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  productId           String?
+  product             PaymentProduct? @relation(fields: [productId], references: [id], onDelete: SetNull)
+  descriptionSnapshot String
+  quantity            Int             @default(1)
+  unitPriceMinor      Int
+  lineTotalMinor      Int
+
+  createdAt DateTime @default(now())
+
+  @@index([orderId])
+  @@index([productId])
+}
+
+model PaymentTransaction {
+  id                    String       @id @default(cuid())
+  publicReference       String       @unique
+  orderId               String
+  order                 PaymentOrder @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  provider              String
+  providerTransactionId String?      @unique
+  providerSessionId     String?
+  status                String       @default("CREATED")
+  currency              String       @default("PGK")
+  amountMinor           Int
+  idempotencyKey        String       @unique
+  redirectUrl           String?
+  failureCode           String?
+  failureMessage        String?
+  requestMetadata       String?
+  responseMetadata      String?
+  verifiedAt            DateTime?
+  expiresAt             DateTime?
+
+  events    PaymentEvent[]
+  refunds   PaymentRefund[]
+  auditLogs PaymentAuditLog[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([orderId])
+  @@index([provider])
+  @@index([status])
+  @@index([createdAt])
+}
+
+model PaymentEvent {
+  id               String             @id @default(cuid())
+  paymentId        String
+  payment          PaymentTransaction @relation(fields: [paymentId], references: [id], onDelete: Cascade)
+  provider         String
+  eventType        String
+  providerEventId  String?            @unique
+  payloadHash      String
+  sanitizedPayload String?
+  signatureValid   Boolean            @default(false)
+  processed        Boolean            @default(false)
+  processingError  String?
+  receivedAt       DateTime           @default(now())
+  processedAt      DateTime?
+
+  @@index([paymentId])
+  @@index([provider])
+  @@index([eventType])
+}
+
+model PaymentRefund {
+  id               String             @id @default(cuid())
+  publicReference  String             @unique
+  paymentId        String
+  payment          PaymentTransaction @relation(fields: [paymentId], references: [id], onDelete: Cascade)
+  providerRefundId String?            @unique
+  amountMinor      Int
+  status           String             @default("PENDING")
+  reason           String?
+  createdById      String?
+  createdBy        User?              @relation(fields: [createdById], references: [id], onDelete: SetNull)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([paymentId])
+  @@index([status])
+}
+
+model DonationCampaign {
+  id                String    @id @default(cuid())
+  publicId          String    @unique
+  title             String
+  slug              String    @unique
+  description       String?
+  goalAmountMinor   Int?
+  raisedAmountMinor Int       @default(0)
+  currency          String    @default("PGK")
+  imageUrl          String?
+  startDate         DateTime?
+  endDate           DateTime?
+  isActive          Boolean   @default(true)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model PaymentAuditLog {
+  id             String              @id @default(cuid())
+  paymentId      String?
+  payment        PaymentTransaction? @relation(fields: [paymentId], references: [id], onDelete: SetNull)
+  orderId        String?
+  order          PaymentOrder?       @relation(fields: [orderId], references: [id], onDelete: SetNull)
+  actorUserId    String?
+  actorUser      User?               @relation(fields: [actorUserId], references: [id], onDelete: SetNull)
+  action         String
+  previousStatus String?
+  newStatus      String?
+  metadata       String?
+  ipAddress      String?
+  userAgent      String?
+
+  createdAt DateTime @default(now())
+
+  @@index([paymentId])
+  @@index([orderId])
+  @@index([actorUserId])
+  @@index([createdAt])
 }

@@ -4,18 +4,23 @@ import Image from "next/image"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
 import { Facebook, Instagram, Linkedin, Mail, MapPin, Music2, Phone, Youtube } from "lucide-react"
-import { navLinks } from "@/lib/constants"
 
 const socialLinks = [
-  { name: "Facebook", href: "https://www.facebook.com/search/top?q=wantok%20radio%20light", icon: Facebook },
+  { name: "Facebook", href: "https://www.facebook.com/ChristianNet?utm_source=chatgpt.com", icon: Facebook },
   { name: "YouTube", href: "https://www.youtube.com/results?search_query=Wantok+Radio+Light", icon: Youtube },
   { name: "LinkedIn", href: "https://www.linkedin.com/search/results/all/?keywords=Wantok%20Radio%20Light", icon: Linkedin },
   { name: "Instagram", href: "https://www.instagram.com/explore/search/keyword/?q=Wantok%20Radio%20Light", icon: Instagram },
   { name: "TikTok", href: "https://www.tiktok.com/search?q=Wantok%20Radio%20Light", icon: Music2 },
 ]
 
+const quickLinks = [
+  { name: "Home", href: "/" },
+  { name: "Contact Us", href: "/contact" },
+  { name: "Support Us", href: "/support-us" },
+]
+
 const footerLinkClass =
-  "inline-flex w-fit items-center gap-2 rounded-md px-2 py-1 text-sm font-semibold text-white/78 transition duration-300 hover:-translate-y-1 hover:bg-yellow-300 hover:text-[#003b36]"
+  "inline-flex w-fit items-center gap-2 rounded-md px-2 py-1 text-sm font-semibold text-white/78 transition duration-300 hover:-translate-y-0.5 hover:bg-yellow-300 hover:text-[#003b36]"
 
 export default function SiteFooter() {
   const pathname = usePathname()
@@ -25,15 +30,16 @@ export default function SiteFooter() {
   }
 
   return (
-    <footer className="relative isolate overflow-hidden border-t border-yellow-300/25 px-4 py-12 text-white sm:px-6 lg:px-8">
+    <footer className="relative isolate overflow-hidden border-t border-yellow-300/20 px-5 py-14 text-white sm:px-6 lg:px-8">
       <div
         className="absolute inset-0 -z-30 scale-105 bg-cover bg-center opacity-30 blur-[1px]"
         style={{ backgroundImage: "url('/images/mainwall.png')" }}
       />
-      <div className="absolute inset-0 -z-20 bg-black/68" />
-      <div className="absolute inset-0 -z-10 bg-[#003b36]/48" />
+      <div className="absolute inset-0 -z-20 bg-[#03110e]/82" />
+      <div className="absolute inset-0 -z-10 bg-[linear-gradient(135deg,rgba(8,43,82,0.42),rgba(0,59,54,0.54))]" />
+      <div className="wrl-premium-grid absolute inset-0 -z-10 opacity-40" />
 
-      <div className="mx-auto grid max-w-7xl gap-10 md:grid-cols-2 lg:grid-cols-[1.35fr_0.9fr_1.15fr_1fr]">
+      <div className="mx-auto grid max-w-7xl gap-10 md:grid-cols-2 lg:grid-cols-[1.35fr_0.75fr_1.1fr_1fr]">
         <div>
           <Link href="/" className="inline-flex transition hover:-translate-y-1">
             <Image
@@ -53,7 +59,7 @@ export default function SiteFooter() {
         <div>
           <h2 className="text-sm font-bold text-yellow-300">Quick Links</h2>
           <nav className="mt-5 flex flex-col gap-2" aria-label="Footer quick links">
-            {navLinks.map((link) => (
+            {quickLinks.map((link) => (
               <Link key={link.href} href={link.href} className={footerLinkClass}>
                 {link.name}
               </Link>

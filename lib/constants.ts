@@ -20,6 +20,7 @@ export const navLinks = [
   { name: "News & Updates", href: "/news" },
   { name: "Support Us", href: "/support-us" },
   { name: "Contact", href: "/contact" },
+  { name: "Donate", href: "/donate" },
 ]
 
 export const programsList = [

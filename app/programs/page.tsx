@@ -8,9 +8,11 @@ export const revalidate = 0
 const programSettingsId = "default"
 
 const featured = [
-  "Belo-Taim Devotion",
-  "Story Bilong Mi",
-  "Praying For The Nation",
+  "Hope Behind Bars",
+  "Heralds of Hope",
+  "Let My People Think",
+  "Bill Gaither Home Coming Radio",
+  "Story Behind the Song",
   "Sunday Service",
   "Focus on the Family",
   "Back to the Bible",
@@ -25,7 +27,10 @@ const localPrograms = [
   "Kirapim Gutpela Sindaun",
   "Health Nuggets",
   "Choice Bilong Listener",
+  "Hope Behind Bars",
   "NBC News Relay",
+  "Live Church Broadcast",
+  "Live RMNC Broadcast",
 ]
 
 const internationalPrograms = [
@@ -36,8 +41,11 @@ const internationalPrograms = [
   "Keys for Kids",
   "Champions Arise",
   "Unshackled",
-  "Reach Beyond",
+  "Heralds of Hope",
   "Heritage & Hope",
+  "Bill Gaither Home Coming Radio",
+  "Story Behind the Song",
+  "Let My People Think",
 ]
 
 const audiences = [

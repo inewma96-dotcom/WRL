@@ -30,19 +30,19 @@ export default function NewsUpdateCard({
   mediaType,
 }: NewsUpdateCardProps) {
   return (
-    <article className="group flex h-full min-h-[360px] flex-col overflow-hidden rounded-lg border border-white/12 bg-white/[0.06] shadow-[0_16px_42px_rgba(0,0,0,0.18)] transition duration-300 hover:-translate-y-1 hover:border-yellow-300/60 hover:bg-white/[0.09]">
+    <article className="group flex h-full min-h-[360px] flex-col overflow-hidden rounded-lg border border-white/12 bg-white/[0.065] shadow-[0_16px_42px_rgba(0,0,0,0.18)] transition duration-300 hover:-translate-y-1.5 hover:border-yellow-300/55 hover:bg-white/[0.095] hover:shadow-[0_26px_70px_rgba(0,0,0,0.28)]">
       {mediaUrl ? (
         <div className="border-b border-white/10 bg-black/35">
           {mediaType === "VIDEO" ? (
             <ResponsiveVideoPlayer src={mediaUrl} title={title} compact />
           ) : (
-            <div className="relative h-52 w-full">
+            <div className="relative h-52 w-full overflow-hidden">
               <Image
                 src={mediaUrl}
                 alt={title}
                 fill
                 sizes="(max-width: 768px) 100vw, (max-width: 1280px) 50vw, 25vw"
-                className="object-cover"
+                className="object-cover transition duration-700 group-hover:scale-105"
               />
             </div>
           )}
@@ -50,7 +50,7 @@ export default function NewsUpdateCard({
       ) : null}
 
       <div className="flex flex-1 flex-col p-4">
-        <div className="inline-flex h-10 w-10 items-center justify-center rounded bg-yellow-400 text-[#071512]">
+        <div className="inline-flex h-10 w-10 items-center justify-center rounded-md bg-yellow-300 text-[#071512] shadow-[0_10px_24px_rgba(250,204,21,0.18)]">
           <HandHeart className="h-5 w-5" aria-hidden="true" />
         </div>
         <p className="mt-4 text-xs font-black uppercase tracking-normal text-yellow-300">
