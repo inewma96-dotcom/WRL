@@ -86,7 +86,7 @@ function renderAction(action: Action, variant: "primary" | "secondary" = "primar
 
 export function PageHero({ eyebrow, title, description, image, actions = [], children }: PageHeroProps) {
   return (
-    <section className="relative isolate overflow-hidden px-5 py-16 sm:px-6 md:py-24 lg:px-8">
+    <section className="relative isolate overflow-hidden bg-[var(--wrl-page-background)] py-16 text-white md:py-20 lg:py-24">
       <Image
         src={image}
         alt=""
@@ -95,20 +95,19 @@ export function PageHero({ eyebrow, title, description, image, actions = [], chi
         sizes="100vw"
         className="absolute inset-0 -z-30 object-cover"
       />
-      <div className="absolute inset-0 -z-20 bg-[#03110e]/72" />
-      <div className="absolute inset-0 -z-10 bg-[linear-gradient(115deg,rgba(0,35,64,0.82),rgba(0,59,54,0.66)_42%,rgba(7,21,18,0.92))]" />
-      <div className="wrl-premium-grid absolute inset-0 -z-10 opacity-60" />
-      <div className="absolute bottom-0 left-0 right-0 -z-10 h-40 bg-gradient-to-t from-[#003b36] to-transparent" />
+      <div className="absolute inset-0 -z-20 bg-black/40" />
+      <div className="absolute inset-0 -z-10 bg-[image:var(--wrl-hero-overlay)]" />
+      <div className="wrl-premium-grid absolute inset-0 -z-10 opacity-35" />
 
-      <div className="mx-auto flex min-h-[62vh] max-w-7xl flex-col justify-center">
-        <div className="max-w-4xl">
-          <p className="text-xs font-black uppercase tracking-[0.24em] text-yellow-300 md:text-sm">
+      <div className="wrl-shell-wide flex min-h-[52vh] flex-col justify-center">
+        <div className="max-w-4xl py-4">
+          <p className="wrl-eyebrow text-[var(--wrl-accent-gold)]">
             {eyebrow}
           </p>
-          <h1 className="mt-5 max-w-4xl text-4xl font-black leading-[1.02] tracking-normal text-white drop-shadow-[0_18px_45px_rgba(0,0,0,0.34)] sm:text-5xl md:text-7xl">
+          <h1 className="wrl-page-title mt-5 max-w-4xl text-balance text-white [overflow-wrap:anywhere]">
             {title}
           </h1>
-          <p className="mt-6 max-w-3xl text-base font-medium leading-8 text-white/84 md:text-xl md:leading-9">
+          <p className="wrl-prose-width mt-6 text-base font-medium leading-8 text-white/85 md:text-xl md:leading-9">
             {description}
           </p>
           {actions.length > 0 ? (
@@ -131,15 +130,15 @@ export function SectionHeading({ eyebrow, title, description, align = "left", to
   return (
     <div className={align === "center" ? "mx-auto max-w-3xl text-center" : "max-w-3xl"}>
       {eyebrow ? (
-        <p className={`text-xs font-black uppercase tracking-[0.22em] md:text-sm ${eyebrowClass}`}>
+        <p className={`wrl-eyebrow ${eyebrowClass}`}>
           {eyebrow}
         </p>
       ) : null}
-      <h2 className={`mt-4 text-3xl font-black leading-[1.08] tracking-normal md:text-5xl ${titleClass}`}>
+      <h2 className={`wrl-section-title mt-4 text-balance [overflow-wrap:anywhere] ${titleClass}`}>
         {title}
       </h2>
       {description ? (
-        <p className={`mt-5 max-w-2xl text-base leading-8 md:text-lg ${descriptionClass}`}>
+        <p className={`wrl-prose-width mt-5 text-base leading-8 md:text-lg ${descriptionClass}`}>
           {description}
         </p>
       ) : null}
@@ -149,28 +148,28 @@ export function SectionHeading({ eyebrow, title, description, align = "left", to
 
 export function InfoCard({ title, description, eyebrow, icon: Icon, href }: InfoCardProps) {
   const body = (
-    <article className="group h-full rounded-lg border border-white/12 bg-white/[0.065] p-6 shadow-[0_18px_55px_rgba(0,0,0,0.2)] transition duration-300 hover:-translate-y-1.5 hover:border-yellow-300/55 hover:bg-white/[0.095] hover:shadow-[0_26px_70px_rgba(0,0,0,0.28)]">
+    <article className={`h-full p-6 md:p-7 ${href ? "wrl-surface-elevated transition-colors duration-200 group-hover:border-[var(--wrl-border-strong)] group-focus-visible:border-[var(--wrl-border-strong)]" : "wrl-surface"}`}>
       {Icon ? (
-        <div className="inline-flex h-11 w-11 items-center justify-center rounded-md bg-yellow-300 text-[#071512] shadow-[0_12px_26px_rgba(250,204,21,0.18)]">
+        <div className="inline-flex h-11 w-11 items-center justify-center rounded-md bg-[var(--wrl-accent-gold)] text-[var(--wrl-accent-gold-foreground)]">
           <Icon className="h-5 w-5" aria-hidden="true" />
         </div>
       ) : null}
       {eyebrow ? (
-        <p className={`${Icon ? "mt-5" : ""} text-sm font-black uppercase tracking-normal text-yellow-300`}>
+        <p className={`${Icon ? "mt-5" : ""} wrl-eyebrow text-[var(--wrl-accent-gold)]`}>
           {eyebrow}
         </p>
       ) : null}
-      <h3 className={`${Icon || eyebrow ? "mt-3" : ""} text-xl font-black leading-snug text-white md:text-2xl`}>
+      <h3 className={`${Icon || eyebrow ? "mt-3" : ""} wrl-card-title text-white`}>
         {title}
       </h3>
-      <p className="mt-4 leading-7 text-white/76">
+      <p className="wrl-body mt-4 text-white/75">
         {description}
       </p>
     </article>
   )
 
   return href ? (
-    <Link href={href} className="block h-full">
+    <Link href={href} className="group block h-full rounded-lg">
       {body}
     </Link>
   ) : body
@@ -178,17 +177,17 @@ export function InfoCard({ title, description, eyebrow, icon: Icon, href }: Info
 
 export function LightCard({ title, description, eyebrow, icon: Icon }: InfoCardProps) {
   return (
-    <article className="rounded-lg border border-[#071512]/10 bg-white p-6 shadow-[0_18px_48px_rgba(7,21,18,0.12)] transition duration-300 hover:-translate-y-1.5 hover:border-[#d71920]/30 hover:shadow-[0_26px_64px_rgba(7,21,18,0.16)]">
-      {Icon ? <Icon className="h-6 w-6 text-[#d71920]" aria-hidden="true" /> : null}
+    <article className="wrl-surface-light p-6 md:p-7">
+      {Icon ? <Icon className="h-6 w-6 text-[var(--wrl-live-red)]" aria-hidden="true" /> : null}
       {eyebrow ? (
-        <p className={`${Icon ? "mt-5" : ""} text-sm font-black uppercase tracking-normal text-[#d71920]`}>
+        <p className={`${Icon ? "mt-5" : ""} wrl-eyebrow text-[var(--wrl-live-red)]`}>
           {eyebrow}
         </p>
       ) : null}
-      <h3 className={`${Icon || eyebrow ? "mt-3" : ""} text-xl font-black leading-snug text-[#071512] md:text-2xl`}>
+      <h3 className={`${Icon || eyebrow ? "mt-3" : ""} wrl-card-title text-[var(--wrl-secondary-foreground)]`}>
         {title}
       </h3>
-      <p className="mt-3 leading-7 text-[#26332f]">
+      <p className="wrl-body mt-3 text-[#34423d]">
         {description}
       </p>
     </article>
@@ -205,29 +204,29 @@ export function FeaturePanel({
   children,
 }: FeaturePanelProps) {
   return (
-    <div className={`mx-auto grid max-w-7xl gap-10 lg:grid-cols-[440px_minmax(0,1fr)] lg:items-center ${reverse ? "lg:grid-cols-[minmax(0,1fr)_440px]" : ""}`}>
+    <div className={`mx-auto grid w-full max-w-7xl gap-10 lg:grid-cols-[minmax(280px,420px)_minmax(0,1fr)] lg:items-center lg:gap-14 ${reverse ? "lg:grid-cols-[minmax(0,1fr)_minmax(280px,420px)]" : ""}`}>
       {image ? (
-        <div className={`relative aspect-square overflow-hidden rounded-lg border border-white/12 bg-black/25 shadow-[0_28px_80px_rgba(0,0,0,0.28)] ${reverse ? "lg:order-2" : ""}`}>
+        <div className={`wrl-shadow-elevated relative aspect-square overflow-hidden rounded-lg border border-[var(--wrl-border)] bg-black/25 ${reverse ? "lg:order-2" : ""}`}>
           <Image
             src={image}
             alt={imageAlt}
             fill
             sizes="(max-width: 1024px) 100vw, 420px"
-            className="object-cover opacity-90 transition duration-700 hover:scale-105"
+            className="object-cover opacity-90"
           />
           <div className="absolute inset-0 bg-gradient-to-t from-[#003b36]/35 via-transparent to-transparent" />
         </div>
       ) : null}
       <div>
         {eyebrow ? (
-          <p className="text-sm font-black uppercase tracking-[0.2em] text-yellow-300">
+          <p className="wrl-eyebrow text-[var(--wrl-accent-gold)]">
             {eyebrow}
           </p>
         ) : null}
-        <h2 className="mt-4 text-3xl font-black leading-[1.08] tracking-normal md:text-5xl">
+        <h2 className="wrl-section-title mt-4 text-balance [overflow-wrap:anywhere]">
           {title}
         </h2>
-        <div className="mt-6 max-w-3xl text-lg leading-8 text-white/80">
+        <div className="wrl-prose-width wrl-body-large mt-6 text-white/80">
           {description}
         </div>
         {children}
@@ -238,25 +237,26 @@ export function FeaturePanel({
 
 export function CTASection({ eyebrow, title, description, primary, secondary }: CTASectionProps) {
   return (
-    <section className="relative isolate overflow-hidden bg-[#071512] px-5 py-16 sm:px-6 lg:px-8">
-      <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_20%,rgba(250,204,21,0.08),transparent_32%),linear-gradient(135deg,rgba(8,43,82,0.36),transparent)]" />
-      <div className="relative mx-auto flex max-w-7xl flex-col gap-8 rounded-lg border border-yellow-300/25 bg-white/[0.055] p-7 shadow-[0_24px_70px_rgba(0,0,0,0.24)] backdrop-blur-sm md:flex-row md:items-center md:justify-between md:p-10">
-        <div className="max-w-3xl">
-          {eyebrow ? (
-            <p className="text-sm font-black uppercase tracking-[0.2em] text-yellow-300">
-              {eyebrow}
+    <section className="relative isolate overflow-hidden bg-[var(--wrl-page-background)] py-12 text-white md:py-16">
+      <div className="wrl-shell-wide">
+        <div className="wrl-surface-elevated relative flex flex-col gap-8 p-7 md:flex-row md:items-center md:justify-between md:p-10">
+          <div className="max-w-3xl">
+            {eyebrow ? (
+              <p className="wrl-eyebrow text-[var(--wrl-accent-gold)]">
+                {eyebrow}
+              </p>
+            ) : null}
+            <h2 className="wrl-section-title mt-3 text-balance [overflow-wrap:anywhere]">
+              {title}
+            </h2>
+            <p className="wrl-prose-width wrl-body-large mt-4 text-white/75">
+              {description}
             </p>
-          ) : null}
-          <h2 className="mt-3 text-3xl font-black md:text-5xl">
-            {title}
-          </h2>
-          <p className="mt-4 text-lg leading-8 text-white/76">
-            {description}
-          </p>
-        </div>
-        <div className="flex shrink-0 flex-wrap gap-3">
-          {renderAction(primary)}
-          {secondary ? renderAction(secondary, "secondary") : null}
+          </div>
+          <div className="flex shrink-0 flex-wrap gap-3">
+            {renderAction(primary)}
+            {secondary ? renderAction(secondary, "secondary") : null}
+          </div>
         </div>
       </div>
     </section>

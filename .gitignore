@@ -13,4 +13,8 @@ node_modules/
 public/uploads/
 prisma/dev.db
 tsconfig.tsbuildinfo
+
+# Ignore real environment files while keeping the safe template trackable.
+.env*
+!.env.example
 .vercel

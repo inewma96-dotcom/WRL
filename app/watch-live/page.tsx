@@ -22,7 +22,7 @@ export default function WatchLivePage() {
           Listen to WRL live
         </h1>
         <p className="mt-5 max-w-2xl text-lg leading-8 text-white/78">
-          Use the floating Listen player on the side of the screen to start the live radio stream from anywhere on the site.
+          Use the live player below the navigation bar to start the radio stream from anywhere on the site.
         </p>
         <Link
           href="/coverage"

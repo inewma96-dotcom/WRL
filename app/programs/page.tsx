@@ -1,5 +1,9 @@
-import { Baby, BookOpen, CalendarDays, Heart, Mic2, Music, Radio, Users } from "lucide-react"
-import { CTASection, InfoCard, LightCard, PageHero, SectionHeading } from "@/components/sections/PublicPageSections"
+import Image from "next/image"
+import Link from "next/link"
+import { ArrowRight, Baby, BookOpen, CalendarDays, Heart, Mic2, Music, Radio, Users } from "lucide-react"
+import ProgramsSchedule from "@/components/ProgramsSchedule"
+import { CTASection, InfoCard, LightCard, SectionHeading } from "@/components/sections/PublicPageSections"
+import { Button } from "@/components/ui/button"
 import { prisma } from "@/lib/prisma"
 
 export const dynamic = "force-dynamic"
@@ -69,6 +73,19 @@ const defaultProgramSettings = {
   contentFocusHeading: "Content Focus",
 }
 
+const dayIds = ["monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday"] as const
+
+function getCurrentPngDay() {
+  const day = new Intl.DateTimeFormat("en-US", {
+    weekday: "long",
+    timeZone: "Pacific/Port_Moresby",
+  })
+    .format(new Date())
+    .toLowerCase()
+
+  return dayIds.find((dayId) => dayId === day) || "monday"
+}
+
 async function getProgramSchedule() {
   try {
     return await Promise.all([
@@ -93,88 +110,86 @@ async function getProgramSchedule() {
 
 export default async function ProgramsPage() {
   const [programSettings, programs] = await getProgramSchedule()
+  const currentDay = getCurrentPngDay()
+  const publicSettings = {
+    heading: programSettings.heading,
+    subheading: programSettings.subheading,
+    timeSlotHeading: programSettings.timeSlotHeading,
+    programHeading: programSettings.programHeading,
+    contentFocusHeading: programSettings.contentFocusHeading,
+  }
+  const publicPrograms = programs.map(({ id, timeSlot, program, contentFocus }) => ({
+    id,
+    timeSlot,
+    program,
+    contentFocus,
+  }))
 
   return (
-    <main className="bg-[#003b36] text-white">
-      <PageHero
-        eyebrow="Programs"
-        title="Programs That Inspire, Encourage & Transform Lives"
-        description="Wantok Radio Light broadcasts local PNG programs and trusted international Christian programs for families, churches, and communities."
-        image="/images/programbg.png"
-        actions={[
-          { label: "Listen Live", href: "/coverage" },
-          { label: "Support Programs", href: "/support-us" },
-        ]}
-      >
-        <section aria-labelledby="program-schedule-heading" className="max-w-6xl">
-          <div className="mb-4 flex flex-col gap-3 md:flex-row md:items-end md:justify-between">
-            <div>
-              <p className="text-xs font-black uppercase tracking-[0.2em] text-yellow-300">
-                On-Air Schedule
-              </p>
-              <h2 id="program-schedule-heading" className="mt-2 text-2xl font-black leading-tight md:text-4xl">
-                {programSettings.heading}
-              </h2>
-              <p className="mt-2 max-w-3xl text-sm leading-6 text-white/78 md:text-base">
-                {programSettings.subheading}
-              </p>
+    <main className="bg-[var(--wrl-page-background)] text-white">
+      <section className="relative isolate overflow-hidden bg-[var(--wrl-page-background)] text-white">
+        <Image
+          src="/images/programbg.png"
+          alt=""
+          fill
+          priority
+          quality={82}
+          sizes="100vw"
+          className="absolute inset-0 -z-30 object-cover object-center"
+        />
+        <div className="absolute inset-0 -z-20 bg-black/60" />
+        <div className="absolute inset-0 -z-10 bg-[image:var(--wrl-hero-overlay)]" />
+
+        <div className="wrl-shell-wide pb-16 pt-28 sm:pb-18 sm:pt-32 lg:pb-20">
+          <div className="max-w-4xl">
+            <p className="wrl-eyebrow text-[var(--wrl-accent-gold)]">WRL Programming</p>
+            <h1 className="wrl-page-title mt-5 text-balance text-white [overflow-wrap:anywhere]">
+              Programs &amp; Schedule
+            </h1>
+            <p className="wrl-prose-width mt-6 text-base font-medium leading-8 text-white/85 md:text-lg">
+              Wantok Radio Light broadcasts local PNG programs and trusted international Christian programs for families, churches, and communities.
+            </p>
+
+            <div className="mt-6 flex items-center gap-3 text-sm font-bold text-white">
+              <Radio className="h-5 w-5 text-[var(--wrl-accent-gold)]" aria-hidden="true" />
+              <span>Wantok Radio Light</span>
+              <span className="border-l border-white/25 pl-3 text-white/72">93.9 FM</span>
             </div>
-            <div className="w-fit rounded border border-yellow-300/50 bg-yellow-300 px-4 py-2 text-xs font-black uppercase tracking-normal text-[#071512]">
-              PNG Time UTC+10
+
+            <div className="mt-8 flex flex-wrap gap-3">
+              <Button asChild variant="gold" size="lg">
+                <Link href="/coverage">
+                  Listen Live
+                  <ArrowRight aria-hidden="true" />
+                </Link>
+              </Button>
+              <Button
+                asChild
+                variant="outline"
+                size="lg"
+                className="border-white/35 text-white hover:bg-white/10"
+              >
+                <Link href="/support-us">Support Programs</Link>
+              </Button>
             </div>
           </div>
+        </div>
+      </section>
 
-          <div className="overflow-hidden rounded-lg border border-white/16 bg-[#071512]/78 shadow-[0_24px_70px_rgba(0,0,0,0.32)] backdrop-blur">
-            {programs.length > 0 ? (
-              <>
-                <div className="hidden grid-cols-[0.72fr_0.9fr_1.5fr] border-b border-white/14 bg-white/[0.08] text-sm font-black uppercase tracking-normal text-yellow-300 md:grid">
-                  <div className="border-r border-white/14 px-5 py-4">
-                    {programSettings.timeSlotHeading}
-                  </div>
-                  <div className="border-r border-white/14 px-5 py-4">
-                    {programSettings.programHeading}
-                  </div>
-                  <div className="px-5 py-4">
-                    {programSettings.contentFocusHeading}
-                  </div>
-                </div>
+      <ProgramsSchedule
+        currentDay={currentDay}
+        programs={publicPrograms}
+        settings={publicSettings}
+      />
 
-                <div className="max-h-[22rem] overflow-y-auto">
-                  {programs.map((program) => (
-                    <article
-                      key={program.id}
-                      className="group grid gap-2 border-b border-white/10 px-5 py-4 text-sm text-white/86 transition last:border-b-0 hover:bg-yellow-300 hover:text-[#071512] md:grid-cols-[0.72fr_0.9fr_1.5fr] md:gap-0 md:px-0 md:py-0"
-                    >
-                      <div className="font-black text-yellow-300 group-hover:text-[#071512] md:border-r md:border-white/10 md:px-5 md:py-4 md:text-white">
-                        {program.timeSlot}
-                      </div>
-                      <div className="font-black md:border-r md:border-white/10 md:px-5 md:py-4">
-                        {program.program}
-                      </div>
-                      <div className="leading-6 md:px-5 md:py-4">
-                        {program.contentFocus}
-                      </div>
-                    </article>
-                  ))}
-                </div>
-              </>
-            ) : (
-              <div className="p-6 text-white/76">
-                No program schedule has been published yet.
-              </div>
-            )}
-          </div>
-        </section>
-      </PageHero>
-
-      <section className="px-6 py-20">
-        <div className="mx-auto max-w-6xl">
+      <section className="wrl-section-dark py-16 md:py-20">
+        <div className="wrl-shell">
           <SectionHeading
             eyebrow="Featured Programs"
             title="Listener favorites on Wantok Radio Light"
             description="These programs bring devotion, testimony, prayer, teaching, and family encouragement to the airwaves."
           />
-          <div className="mt-12 grid gap-5 md:grid-cols-2 xl:grid-cols-3">
+          <div className="mt-10 grid gap-5 md:grid-cols-2 xl:grid-cols-3">
             {featured.map((program) => (
               <InfoCard
                 key={program}
@@ -187,8 +202,8 @@ export default async function ProgramsPage() {
         </div>
       </section>
 
-      <section className="bg-[#071512] px-6 py-20">
-        <div className="mx-auto grid max-w-6xl gap-12 lg:grid-cols-2">
+      <section className="wrl-section-brand py-16 md:py-20">
+        <div className="wrl-shell grid gap-12 lg:grid-cols-2 lg:gap-14">
           <div>
             <SectionHeading
               eyebrow="Local PNG Programs"
@@ -197,7 +212,7 @@ export default async function ProgramsPage() {
             />
             <div className="mt-8 grid gap-3">
               {localPrograms.map((program) => (
-                <div key={program} className="rounded border border-white/10 bg-white/[0.06] px-4 py-3 font-semibold text-white/86">
+                <div key={program} className="min-h-12 rounded-md border border-[var(--wrl-border)] bg-white/[0.06] px-4 py-3 font-semibold text-white/86">
                   {program}
                 </div>
               ))}
@@ -212,7 +227,7 @@ export default async function ProgramsPage() {
             />
             <div className="mt-8 grid gap-3">
               {internationalPrograms.map((program) => (
-                <div key={program} className="rounded border border-white/10 bg-white/[0.06] px-4 py-3 font-semibold text-white/86">
+                <div key={program} className="min-h-12 rounded-md border border-[var(--wrl-border)] bg-white/[0.06] px-4 py-3 font-semibold text-white/86">
                   {program}
                 </div>
               ))}
@@ -221,15 +236,15 @@ export default async function ProgramsPage() {
         </div>
       </section>
 
-      <section className="bg-[#f8f6ef] px-6 py-20 text-[#071512]">
-        <div className="mx-auto max-w-6xl">
+      <section className="wrl-section-light py-16 md:py-20">
+        <div className="wrl-shell">
           <SectionHeading
             eyebrow="Programs By Audience"
             title="Content for every season of life"
             description="WRL programs are shaped for families, women, children, churches, and everyday listeners."
             tone="light"
           />
-          <div className="mt-12 grid gap-5 md:grid-cols-2 xl:grid-cols-4">
+          <div className="mt-10 grid gap-5 md:grid-cols-2 xl:grid-cols-4">
             {audiences.map((audience) => (
               <LightCard key={audience.title} {...audience} />
             ))}
@@ -237,14 +252,14 @@ export default async function ProgramsPage() {
         </div>
       </section>
 
-      <section className="px-6 py-20">
-        <div className="mx-auto max-w-6xl">
+      <section className="wrl-section-dark py-16 md:py-20">
+        <div className="wrl-shell">
           <SectionHeading
             eyebrow="Weekly Schedule"
             title="A steady rhythm of faith and encouragement"
             description="Exact program times may change, but the station keeps a balanced schedule of devotion, teaching, music, prayer, and community content."
           />
-          <div className="mt-12 grid gap-5 md:grid-cols-3">
+          <div className="mt-10 grid gap-5 md:grid-cols-3">
             {schedule.map((slot) => (
               <InfoCard key={slot.title} {...slot} />
             ))}

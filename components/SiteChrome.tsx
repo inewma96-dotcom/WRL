@@ -13,8 +13,8 @@ export default function SiteChrome() {
 
   return (
     <>
-      <Navbar />
-      <FloatingRadioPlayer />
+      <Navbar key={pathname} />
+      <FloatingRadioPlayer variant="topbar" />
     </>
   )
 }

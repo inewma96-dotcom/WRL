@@ -27,6 +27,8 @@ export default function ContactForm() {
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault()
 
+    if (loading) return
+
     setLoading(true)
     setSuccessMessage("")
     setErrorMessage("")
@@ -62,38 +64,55 @@ export default function ContactForm() {
     }
   }
 
+  const fieldClassName =
+    "h-12 w-full rounded-md border border-[#071512]/15 bg-[#f8f6ef] px-4 text-base text-[#071512] outline-none transition-colors placeholder:text-[#66736e] focus:border-[var(--wrl-primary)] focus:bg-white focus:ring-2 focus:ring-[var(--wrl-focus-ring)]/55"
+
   return (
-    <div className="rounded-lg border border-[#071512]/10 bg-white p-6 text-[#071512] shadow-[0_24px_70px_rgba(7,21,18,0.16)] md:p-8">
-      <form onSubmit={handleSubmit} className="space-y-5">
-        <div className="grid gap-5 md:grid-cols-2">
+    <div className="rounded-lg border border-[#071512]/10 bg-white p-6 text-[#071512] shadow-[var(--wrl-shadow-elevated)] sm:p-8 lg:p-10">
+      <div className="mb-8">
+        <p className="wrl-eyebrow text-[var(--wrl-live-red)]">Send Us A Message</p>
+        <h2 className="mt-3 text-2xl font-black leading-tight sm:text-3xl">How can we help?</h2>
+        <p className="mt-3 leading-7 text-[#52605b]">
+          Complete the form below and your message will be submitted to Wantok Radio Light.
+        </p>
+      </div>
+      <form onSubmit={handleSubmit} className="space-y-5" aria-busy={loading}>
+        <div className="grid gap-5 sm:grid-cols-2">
           <div>
             <label htmlFor="name" className="mb-2 block text-sm font-black">
-              Name
+              Name <span className="text-[var(--wrl-live-red)]" aria-hidden="true">*</span>
+              <span className="sr-only"> (required)</span>
             </label>
             <input
               id="name"
               name="name"
               type="text"
               placeholder="Enter your name"
+              autoComplete="name"
               value={formData.name}
               onChange={handleChange}
-              className="h-12 w-full rounded-md border border-[#071512]/15 bg-[#f8f6ef]/70 px-4 text-sm outline-none transition focus:border-[#082b52] focus:bg-white focus:ring-2 focus:ring-yellow-400/70"
+              className={fieldClassName}
+              disabled={loading}
               required
             />
           </div>
 
           <div>
             <label htmlFor="email" className="mb-2 block text-sm font-black">
-              Email
+              Email <span className="text-[var(--wrl-live-red)]" aria-hidden="true">*</span>
+              <span className="sr-only"> (required)</span>
             </label>
             <input
               id="email"
               name="email"
               type="email"
               placeholder="Enter your email"
+              autoComplete="email"
+              inputMode="email"
               value={formData.email}
               onChange={handleChange}
-              className="h-12 w-full rounded-md border border-[#071512]/15 bg-[#f8f6ef]/70 px-4 text-sm outline-none transition focus:border-[#082b52] focus:bg-white focus:ring-2 focus:ring-yellow-400/70"
+              className={fieldClassName}
+              disabled={loading}
               required
             />
           </div>
@@ -101,23 +120,27 @@ export default function ContactForm() {
 
         <div>
           <label htmlFor="subject" className="mb-2 block text-sm font-black">
-            Subject
+            Subject <span className="text-[var(--wrl-live-red)]" aria-hidden="true">*</span>
+            <span className="sr-only"> (required)</span>
           </label>
           <input
             id="subject"
             name="subject"
             type="text"
             placeholder="Enter subject"
+            autoComplete="off"
             value={formData.subject}
             onChange={handleChange}
-            className="h-12 w-full rounded-md border border-[#071512]/15 bg-[#f8f6ef]/70 px-4 text-sm outline-none transition focus:border-[#082b52] focus:bg-white focus:ring-2 focus:ring-yellow-400/70"
+            className={fieldClassName}
+            disabled={loading}
             required
           />
         </div>
 
         <div>
           <label htmlFor="message" className="mb-2 block text-sm font-black">
-            Message
+            Message <span className="text-[var(--wrl-live-red)]" aria-hidden="true">*</span>
+            <span className="sr-only"> (required)</span>
           </label>
           <textarea
             id="message"
@@ -126,19 +149,20 @@ export default function ContactForm() {
             placeholder="Write your message"
             value={formData.message}
             onChange={handleChange}
-            className="w-full rounded-md border border-[#071512]/15 bg-[#f8f6ef]/70 px-4 py-3 text-sm outline-none transition focus:border-[#082b52] focus:bg-white focus:ring-2 focus:ring-yellow-400/70"
+            className="min-h-40 w-full resize-y rounded-md border border-[#071512]/15 bg-[#f8f6ef] px-4 py-3 text-base text-[#071512] outline-none transition-colors placeholder:text-[#66736e] focus:border-[var(--wrl-primary)] focus:bg-white focus:ring-2 focus:ring-[var(--wrl-focus-ring)]/55"
+            disabled={loading}
             required
           />
         </div>
 
         {successMessage && (
-          <p className="rounded-md border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm font-semibold text-emerald-800">
+          <p role="status" aria-live="polite" className="rounded-md border border-emerald-300 bg-emerald-50 px-4 py-3 text-sm font-semibold leading-6 text-emerald-900">
             {successMessage}
           </p>
         )}
 
         {errorMessage && (
-          <p className="rounded-md border border-red-200 bg-red-50 px-4 py-3 text-sm font-semibold text-red-800">
+          <p role="alert" className="rounded-md border border-red-300 bg-red-50 px-4 py-3 text-sm font-semibold leading-6 text-red-900">
             {errorMessage}
           </p>
         )}
@@ -146,7 +170,7 @@ export default function ContactForm() {
         <button
           type="submit"
           disabled={loading}
-          className="inline-flex min-h-11 items-center justify-center rounded-md bg-yellow-300 px-6 py-3 text-sm font-black uppercase tracking-normal text-[#071512] shadow-[0_14px_32px_rgba(250,204,21,0.2)] transition hover:-translate-y-0.5 hover:bg-[#071512] hover:text-white disabled:cursor-not-allowed disabled:opacity-70"
+          className="inline-flex min-h-12 w-full items-center justify-center rounded-md bg-[var(--wrl-accent-gold)] px-6 py-3 text-sm font-black uppercase text-[var(--wrl-accent-gold-foreground)] shadow-[var(--wrl-shadow-soft)] transition-colors hover:bg-[#ffda55] disabled:cursor-not-allowed disabled:opacity-65 sm:w-auto"
         >
           {loading ? "Sending..." : "Send Message"}
         </button>

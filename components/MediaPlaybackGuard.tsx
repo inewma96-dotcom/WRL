@@ -2,6 +2,10 @@
 
 import { useEffect } from "react"
 
+export type FloatingRadioPlayDetail = {
+  mediaUrl: string
+}
+
 function stopMedia(media: HTMLMediaElement) {
   media.pause()
 }
@@ -56,7 +60,8 @@ export default function MediaPlaybackGuard() {
     const handleFloatingRadioPlay = (event: Event) => {
       stopOtherPageMedia()
 
-      const detail = event instanceof CustomEvent ? event.detail : null
+      const detail =
+        event instanceof CustomEvent ? (event.detail as FloatingRadioPlayDetail) : null
 
       if (detail?.mediaUrl) {
         trackPlayback({

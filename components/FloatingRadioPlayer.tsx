@@ -1,9 +1,10 @@
 "use client"
 
 import { useEffect, useRef, useState } from "react"
-import { Pause, Play } from "lucide-react"
-import { stopOtherPageMedia } from "@/components/MediaPlaybackGuard"
+import { LoaderCircle, Pause, Play, RotateCcw, Volume2, VolumeX } from "lucide-react"
+import { stopOtherPageMedia, type FloatingRadioPlayDetail } from "@/components/MediaPlaybackGuard"
 import { WRL_LIVE_STREAM_URL } from "@/lib/live-stream"
+import { cn } from "@/lib/utils"
 
 function getFreshStreamUrl(src?: string) {
   const streamUrl = src || WRL_LIVE_STREAM_URL
@@ -12,104 +13,320 @@ function getFreshStreamUrl(src?: string) {
   return `${streamUrl}${separator}t=${Date.now()}`
 }
 
-export default function FloatingRadioPlayer({ src }: { src?: string }) {
+type PlayerStatus = "idle" | "connecting" | "playing" | "paused" | "reconnecting" | "error"
+
+type FloatingRadioPlayerProps = {
+  src?: string
+  variant?: "floating" | "topbar"
+}
+
+const signalBars = [10, 18, 26, 14, 22]
+
+const statusLabels: Record<PlayerStatus, string> = {
+  idle: "Ready",
+  connecting: "Connecting",
+  playing: "Playing",
+  paused: "Paused",
+  reconnecting: "Reconnecting",
+  error: "Unable to connect",
+}
+
+export default function FloatingRadioPlayer({ src, variant = "floating" }: FloatingRadioPlayerProps) {
   const audioRef = useRef<HTMLAudioElement | null>(null)
-  const [isPlaying, setIsPlaying] = useState(false)
-  const [hasError, setHasError] = useState(false)
+  const playRequestRef = useRef(false)
+  const playbackIntentRef = useRef(false)
+  const previousVolumeRef = useRef(0.8)
+  const [status, setStatus] = useState<PlayerStatus>("idle")
+  const [volume, setVolume] = useState(0.8)
+  const [isMuted, setIsMuted] = useState(false)
+
+  const isPlaying = status === "playing"
+  const isBusy = status === "connecting" || status === "reconnecting"
 
   useEffect(() => {
     const audio = new Audio()
 
     audio.src = getFreshStreamUrl(src)
     audio.preload = "none"
-
+    audio.volume = 0.8
     audioRef.current = audio
-    const handlePlaying = () => {
-      setHasError(false)
-      setIsPlaying(true)
-    }
-    const handlePause = () => setIsPlaying(false)
-    const handleError = () => {
-      setHasError(true)
-      setIsPlaying(false)
-    }
 
+    const handleLoadStart = () => {
+      if (playbackIntentRef.current) {
+        setStatus("connecting")
+      }
+    }
+    const handlePlaying = () => {
+      playRequestRef.current = false
+      setStatus("playing")
+    }
+    const handlePause = () => {
+      playRequestRef.current = false
+      playbackIntentRef.current = false
+      setStatus((current) =>
+        current === "error" || current === "connecting" || current === "reconnecting"
+          ? current
+          : "paused",
+      )
+    }
+    const handleWaiting = () => {
+      if (playbackIntentRef.current) {
+        setStatus((current) => (current === "playing" ? "reconnecting" : "connecting"))
+      }
+    }
+    const handleStalled = () => {
+      if (playbackIntentRef.current) {
+        setStatus("reconnecting")
+      }
+    }
+    const handleError = () => {
+      playRequestRef.current = false
+      playbackIntentRef.current = false
+      setStatus("error")
+    }
     const handlePageMediaPlay = () => {
       audio.pause()
-      setIsPlaying(false)
+      playRequestRef.current = false
+      playbackIntentRef.current = false
+      setStatus("paused")
     }
 
+    audio.addEventListener("loadstart", handleLoadStart)
     audio.addEventListener("playing", handlePlaying)
     audio.addEventListener("pause", handlePause)
+    audio.addEventListener("waiting", handleWaiting)
+    audio.addEventListener("stalled", handleStalled)
     audio.addEventListener("error", handleError)
     window.addEventListener("wrl:page-media-play", handlePageMediaPlay)
 
     return () => {
+      audio.removeEventListener("loadstart", handleLoadStart)
       audio.removeEventListener("playing", handlePlaying)
       audio.removeEventListener("pause", handlePause)
+      audio.removeEventListener("waiting", handleWaiting)
+      audio.removeEventListener("stalled", handleStalled)
       audio.removeEventListener("error", handleError)
       window.removeEventListener("wrl:page-media-play", handlePageMediaPlay)
       audio.pause()
-      audio.src = ""
+      audio.removeAttribute("src")
+      audio.load()
+      audioRef.current = null
     }
   }, [src])
 
-  const handleToggle = async () => {
-    if (!audioRef.current) return
+  async function startPlayback() {
+    const audio = audioRef.current
+
+    if (!audio || playRequestRef.current) return
+
+    playRequestRef.current = true
+    playbackIntentRef.current = true
+    setStatus("connecting")
 
     try {
-      audioRef.current.muted = false
+      stopOtherPageMedia()
+      audio.src = getFreshStreamUrl(src)
+      audio.load()
+      await audio.play()
 
-      if (isPlaying) {
-        audioRef.current.pause()
-        setIsPlaying(false)
-      } else {
-        stopOtherPageMedia()
-        setHasError(false)
-        audioRef.current.src = getFreshStreamUrl(src)
-        audioRef.current.load()
-        await audioRef.current.play()
-        window.dispatchEvent(
-          new CustomEvent("wrl:floating-radio-play", {
-            detail: { mediaUrl: audioRef.current.src },
-          }),
-        )
-      }
+      window.dispatchEvent(
+        new CustomEvent<FloatingRadioPlayDetail>("wrl:floating-radio-play", {
+          detail: { mediaUrl: audio.currentSrc || audio.src },
+        }),
+      )
     } catch (error) {
       console.error("Audio playback error:", error)
-      setHasError(true)
-      setIsPlaying(false)
+      playRequestRef.current = false
+      playbackIntentRef.current = false
+      setStatus("error")
     }
   }
 
-  return (
-    <div className="fixed bottom-5 right-4 z-[60] sm:bottom-auto sm:top-1/2 sm:-translate-y-1/2">
-      <div className="group relative min-w-20 rounded-2xl border border-yellow-400/30 bg-black/35 p-3 shadow-[0_18px_42px_rgba(0,0,0,0.35)] backdrop-blur-md transition duration-500 hover:border-yellow-400/75 hover:shadow-[0_24px_55px_rgba(0,0,0,0.42)] sm:min-w-24 sm:p-4">
-        <div className="absolute inset-0 bg-gradient-to-br from-yellow-400/10 via-transparent to-white/5" />
-        <span className="pointer-events-none absolute bottom-full left-1/2 z-30 mb-3 w-48 -translate-x-1/2 translate-y-2 rounded-md border border-yellow-300/40 bg-[#071512] px-4 py-3 text-center text-xs font-bold leading-5 text-white opacity-0 shadow-[0_18px_40px_rgba(0,0,0,0.35)] transition duration-200 before:absolute before:bottom-0 before:left-1/2 before:h-3 before:w-3 before:-translate-x-1/2 before:translate-y-1/2 before:rotate-45 before:border-b before:border-r before:border-yellow-300/40 before:bg-[#071512] group-hover:translate-y-0 group-hover:opacity-100 group-focus-within:translate-y-0 group-focus-within:opacity-100 sm:bottom-auto sm:left-auto sm:right-full sm:top-1/2 sm:mb-0 sm:mr-3 sm:-translate-y-1/2 sm:translate-x-2 sm:before:bottom-auto sm:before:left-auto sm:before:right-0 sm:before:top-1/2 sm:before:translate-x-1/2 sm:before:-translate-y-1/2 sm:before:border-b sm:before:border-r sm:group-hover:translate-x-0 sm:group-hover:-translate-y-1/2 sm:group-focus-within:translate-x-0 sm:group-focus-within:-translate-y-1/2">
-          {isPlaying ? "Turned Off 93.9 FM" : "Play Wantok Radio Light"}
-        </span>
+  function handleToggle() {
+    const audio = audioRef.current
+    if (!audio || isBusy) return
 
-        <div className="absolute left-1/2 top-[38px] h-20 w-20 -translate-x-1/2 -translate-y-1/2 rounded-full border border-yellow-400/20 animate-[signalPulse_2s_ease-out_infinite]" />
-        <div className="absolute left-1/2 top-[38px] h-28 w-28 -translate-x-1/2 -translate-y-1/2 rounded-full border border-yellow-400/10 animate-[signalPulse_2.6s_ease-out_infinite]" />
+    if (isPlaying) {
+      audio.pause()
+      return
+    }
 
+    void startPlayback()
+  }
+
+  function handleVolumeChange(nextVolume: number) {
+    const audio = audioRef.current
+    const clampedVolume = Math.min(Math.max(nextVolume, 0), 1)
+
+    setVolume(clampedVolume)
+    setIsMuted(clampedVolume === 0)
+
+    if (clampedVolume > 0) {
+      previousVolumeRef.current = clampedVolume
+    }
+
+    if (audio) {
+      audio.volume = clampedVolume
+      audio.muted = clampedVolume === 0
+    }
+  }
+
+  function handleMuteToggle() {
+    const audio = audioRef.current
+    const nextMuted = !isMuted
+
+    setIsMuted(nextMuted)
+
+    if (!audio) return
+
+    if (nextMuted) {
+      if (volume > 0) {
+        previousVolumeRef.current = volume
+      }
+      audio.muted = true
+      return
+    }
+
+    const restoredVolume = volume > 0 ? volume : previousVolumeRef.current
+    audio.volume = restoredVolume
+    audio.muted = false
+    setVolume(restoredVolume)
+  }
+
+  const player = (
+    <section
+      aria-label="Wantok Radio Light live radio player"
+      className={cn(
+        "pointer-events-auto flex min-h-16 w-full items-center gap-2 rounded-md border border-[var(--wrl-border-strong)] bg-[var(--wrl-primary)] px-2.5 py-2 text-white shadow-[var(--wrl-shadow-elevated)] sm:gap-3 sm:px-3",
+        variant === "topbar" ? "max-w-[640px]" : "max-w-[380px]",
+      )}
+    >
+      <button
+        type="button"
+        onClick={handleToggle}
+        disabled={isBusy}
+        aria-label={isPlaying ? "Pause Wantok Radio Light" : "Play Wantok Radio Light"}
+        className="inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-[var(--wrl-accent-gold)] text-[var(--wrl-accent-gold-foreground)] shadow-sm transition-colors duration-200 hover:bg-[var(--wrl-cream)] active:bg-white disabled:pointer-events-none disabled:opacity-75"
+      >
+        {isBusy ? (
+          <LoaderCircle className="h-5 w-5 animate-spin motion-reduce:animate-none" aria-hidden="true" />
+        ) : isPlaying ? (
+          <Pause className="h-5 w-5 fill-current" aria-hidden="true" />
+        ) : (
+          <Play className="h-5 w-5 fill-current" aria-hidden="true" />
+        )}
+      </button>
+
+      <div className="min-w-0 flex-1">
+        <p className="truncate text-[10px] font-extrabold uppercase tracking-[0.14em] text-[var(--wrl-accent-gold)] sm:text-[11px]">
+          Listen Live
+        </p>
+        <p className="truncate text-xs font-bold text-white sm:text-sm">
+          Wantok Radio Light
+          <span className="ml-1.5 border-l border-white/24 pl-1.5 font-semibold text-white/68">
+            93.9 FM
+          </span>
+        </p>
+        <p
+          className={cn(
+            "truncate text-[10px] font-semibold sm:hidden",
+            status === "error" ? "text-red-300" : "text-white/68",
+          )}
+          role="status"
+          aria-live="polite"
+          aria-atomic="true"
+        >
+          {statusLabels[status]}
+        </p>
+      </div>
+
+      <div
+        className="hidden h-8 shrink-0 items-center gap-1 border-x border-white/12 px-3 sm:flex"
+        aria-hidden="true"
+      >
+        {signalBars.map((height, index) => (
+          <span
+            key={`${height}-${index}`}
+            className={cn(
+              "block w-1 rounded-full bg-white/32",
+              isPlaying && "bg-[var(--wrl-accent-gold)]",
+              index === 2 && isPlaying && "bg-[var(--wrl-cream)]",
+            )}
+            style={{ height }}
+          />
+        ))}
+      </div>
+
+      <div className="hidden w-[108px] shrink-0 sm:block">
+        <p
+          className={cn(
+            "truncate text-xs font-bold",
+            status === "error" ? "text-red-300" : "text-white",
+          )}
+          role="status"
+          aria-live="polite"
+          aria-atomic="true"
+        >
+          {statusLabels[status]}
+        </p>
+        {status === "error" ? (
+          <button
+            type="button"
+            onClick={() => void startPlayback()}
+            className="mt-0.5 inline-flex min-h-6 items-center gap-1 rounded text-[11px] font-bold text-[var(--wrl-accent-gold)] underline underline-offset-2 transition-colors hover:text-white"
+          >
+            <RotateCcw className="h-3 w-3" aria-hidden="true" />
+            Retry
+          </button>
+        ) : (
+          <p className="text-[10px] text-white/58">
+            {isPlaying ? "Stream connected" : "Audio stream"}
+          </p>
+        )}
+      </div>
+
+      <div className="flex shrink-0 items-center gap-2">
         <button
           type="button"
-          onClick={handleToggle}
-          className="relative z-10 mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-yellow-300 text-black shadow-lg shadow-yellow-500/25 transition duration-300 hover:scale-105 hover:bg-yellow-200 sm:h-16 sm:w-16"
-          aria-label={isPlaying ? "Pause live radio" : "Play live radio"}
+          onClick={handleMuteToggle}
+          aria-label={isMuted ? "Unmute live radio" : "Mute live radio"}
+          className="inline-flex h-11 w-11 items-center justify-center rounded-md text-white/68 transition-colors duration-200 hover:bg-white/10 hover:text-white"
         >
-          {isPlaying ? (
-            <Pause className="h-6 w-6" aria-hidden="true" />
+          {isMuted || volume === 0 ? (
+            <VolumeX className="h-5 w-5" aria-hidden="true" />
           ) : (
-            <Play className="h-6 w-6 fill-current" aria-hidden="true" />
+            <Volume2 className="h-5 w-5" aria-hidden="true" />
           )}
         </button>
 
-        <p className="relative z-10 mx-auto mt-2 max-w-20 text-center text-xs font-bold leading-tight text-white sm:mt-3 sm:text-sm">
-          {isPlaying ? "On Air Now" : hasError ? "Try Again" : "Listen"}
-        </p>
+        <label className="hidden items-center md:flex">
+          <span className="sr-only">Live radio volume</span>
+          <input
+            type="range"
+            min="0"
+            max="1"
+            step="0.05"
+            value={isMuted ? 0 : volume}
+            onChange={(event) => handleVolumeChange(Number(event.currentTarget.value))}
+            aria-valuetext={`${Math.round((isMuted ? 0 : volume) * 100)} percent`}
+            className="h-11 w-20 cursor-pointer accent-[var(--wrl-accent-gold)] lg:w-24"
+          />
+        </label>
       </div>
+    </section>
+  )
+
+  if (variant === "topbar") {
+    return (
+      <div className="pointer-events-none fixed inset-x-0 top-[72px] z-40 flex justify-center px-2 pt-2 sm:top-[82px] sm:px-4">
+        {player}
+      </div>
+    )
+  }
+
+  return (
+    <div className="fixed bottom-[calc(1rem+env(safe-area-inset-bottom))] right-4 z-[60] w-[calc(100%-2rem)] max-w-[380px]">
+      {player}
     </div>
   )
 }

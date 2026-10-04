@@ -43,9 +43,15 @@ export default function RouteFadeTransition({ children }: RouteFadeTransitionPro
 
   useEffect(() => {
     const root = document.documentElement
+    const main = document.querySelector("main")
 
     root.classList.remove("route-fade-out")
     root.classList.add("route-fade-in")
+
+    if (main) {
+      main.id = "main-content"
+      main.tabIndex = -1
+    }
 
     const timeout = window.setTimeout(() => {
       root.classList.remove("route-fade-in")

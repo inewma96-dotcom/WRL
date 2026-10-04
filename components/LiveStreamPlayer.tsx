@@ -83,7 +83,7 @@ export default function LiveStreamPlayer() {
             </p>
           ) : (
             <p className="mt-4 text-sm leading-6 text-white/70">
-              Press play once. If the stream pauses while changing pages, use this player or the floating Listen button to reconnect.
+              Press play once. If the stream pauses while changing pages, use this player or the live player below the navigation bar to reconnect.
             </p>
           )}
         </div>
