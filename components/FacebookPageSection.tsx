@@ -1,10 +1,16 @@
 import Image from "next/image"
-import { ExternalLink, Facebook, Radio } from "lucide-react"
+import { ExternalLink, Facebook, Linkedin, Music2, Radio, Youtube } from "lucide-react"
 import { Button } from "@/components/ui/button"
 
 const facebookPageUrl = "https://www.facebook.com/ChristianNet"
 const facebookEmbedUrl =
   "https://www.facebook.com/plugins/page.php?href=https%3A%2F%2Fwww.facebook.com%2FChristianNet&tabs=timeline&width=500&height=560&small_header=false&adapt_container_width=true&hide_cover=false&show_facepile=true"
+
+const upcomingChannels = [
+  { name: "YouTube", detail: "WRL video updates", icon: Youtube },
+  { name: "TikTok", detail: "Short-form updates", icon: Music2 },
+  { name: "LinkedIn", detail: "Ministry network", icon: Linkedin },
+]
 
 export default function FacebookPageSection() {
   return (
@@ -41,6 +47,21 @@ export default function FacebookPageSection() {
               <ExternalLink aria-hidden="true" />
             </a>
           </Button>
+
+          <div className="mt-8 grid gap-3 sm:grid-cols-3" aria-label="Additional social channels">
+            {upcomingChannels.map(({ name, detail, icon: Icon }) => (
+              <div key={name} className="flex min-w-0 items-center gap-3 rounded-lg border border-black/10 bg-white p-4">
+                <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-md bg-[var(--wrl-primary)] text-[var(--wrl-accent-gold)]" aria-hidden="true">
+                  <Icon className="h-5 w-5" />
+                </span>
+                <div className="min-w-0">
+                  <p className="font-extrabold text-[var(--wrl-secondary-foreground)]">{name}</p>
+                  <p className="mt-0.5 text-xs leading-5 text-[#52605b]">{detail}</p>
+                  <p className="mt-1 text-[10px] font-extrabold uppercase text-[#9a7100]">Coming soon</p>
+                </div>
+              </div>
+            ))}
+          </div>
         </div>
 
         <article className="wrl-shadow-elevated mx-auto w-full max-w-[520px] overflow-hidden rounded-lg border border-black/10 bg-white">

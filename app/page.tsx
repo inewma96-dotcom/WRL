@@ -1,9 +1,12 @@
 import Image from "next/image"
 import Link from "next/link"
-import { ArrowRight, BookOpen, Clock3, HandHeart, Headphones, Library, Radio, RadioTower, Users, Video } from "lucide-react"
+import type { CSSProperties } from "react"
+import { ArrowRight, BookOpen, Building2, Clock3, HandHeart, Headphones, Heart, Quote, Radio, Users } from "lucide-react"
 import AirwaveAudioCard from "@/components/AirwaveAudioCard"
 import FacebookPageSection from "@/components/FacebookPageSection"
 import HomeProgramTabs from "@/components/HomeProgramTabs"
+import HomeHistoryTimeline from "@/components/HomeHistoryTimeline"
+import HomeStationFacts from "@/components/HomeStationFacts"
 import NewsUpdateCard from "@/components/NewsUpdateCard"
 import { SectionHeading } from "@/components/sections/PublicPageSections"
 import { Button } from "@/components/ui/button"
@@ -48,41 +51,34 @@ const internationalPrograms = [
 ]
 
 const impact = [
-  { title: "Serving PNG since 2002", description: "A faithful Christian broadcast ministry for listeners across Papua New Guinea.", icon: Radio },
-  { title: "Christian programs daily", description: "Bible teaching, prayer, family programs, worship, and community encouragement.", icon: BookOpen },
-  { title: "FM, shortwave, and online", description: "Listeners can tune in through radio, live stream, and mobile listening options.", icon: Headphones },
-  { title: "Ministry partners", description: "Local and international partners help keep the Gospel on the air.", icon: Users },
+  { title: "Serving PNG since 2002", description: "A faithful Christian broadcast ministry for listeners across Papua New Guinea.", icon: Radio, color: "#d71920", foreground: "#ffffff", glow: "rgba(215, 25, 32, 0.42)", titleClass: "font-black" },
+  { title: "Christian programs daily", description: "Bible teaching, prayer, family programs, worship, and community encouragement.", icon: BookOpen, color: "#f7c928", foreground: "#071512", glow: "rgba(247, 201, 40, 0.48)", titleClass: "font-serif font-bold italic" },
+  { title: "FM, shortwave, and online", description: "Listeners can tune in through radio, live stream, and mobile listening options.", icon: Headphones, color: "#007a52", foreground: "#ffffff", glow: "rgba(0, 122, 82, 0.44)", titleClass: "font-black uppercase" },
+  { title: "Ministry partners", description: "Local and international partners help keep the Gospel on the air.", icon: Users, color: "#3949ab", foreground: "#ffffff", glow: "rgba(57, 73, 171, 0.42)", titleClass: "font-serif font-black" },
 ]
 
-const broadcastCoverage = [
+const supportPaths = [
   {
-    eyebrow: "FM Coverage",
-    location: "Port Moresby",
-    frequency: "93.9 FM",
-    description: "Local FM broadcast coverage for listeners in the capital city.",
-    icon: Radio,
+    title: "Prayer Partners",
+    description: "Commit to pray for our staff, our listeners, and the reach of the Gospel across PNG.",
+    href: "/prayer-request",
+    action: "Share a prayer request",
+    icon: Heart,
   },
   {
-    eyebrow: "Shortwave Coverage",
-    location: "Mt Hagen",
-    frequency: "7325 kHz",
-    description: "Shortwave transmission on the 41 metre band for wider regional listening.",
-    icon: RadioTower,
-  },
-]
-
-const digitalListeningOptions = [
-  {
-    title: "Watch Live",
-    description: "Open the WRL live stream in your browser when internet access is available.",
-    href: "/watch-live",
-    icon: Video,
+    title: "Sponsors",
+    description: "Businesses, churches, and ministry friends can help sustain daily broadcasting operations.",
+    href: "/contact",
+    action: "Contact WRL",
+    icon: Building2,
   },
   {
-    title: "Recorded Programs",
-    description: "Visit Airwaves for available WRL program recordings and updates.",
-    href: "/airwaves",
-    icon: Library,
+    title: "Share-a-thon",
+    description: "Make a pledge during our annual fundraising drive and help us reach the unreached.",
+    href: "/donate",
+    action: "View giving details",
+    icon: HandHeart,
+    featured: true,
   },
 ]
 
@@ -241,61 +237,108 @@ export default async function HomePage() {
               <ArrowRight className="h-4 w-4" aria-hidden="true" />
             </Link>
           </aside>
+
         </div>
       </section>
 
-      <section className="wrl-section-light py-16 md:py-20">
-        <div className="wrl-shell grid gap-10 lg:grid-cols-[minmax(0,1fr)_minmax(300px,420px)] lg:items-center lg:gap-14">
-          <div>
-            <p className="wrl-eyebrow text-[var(--wrl-live-red)]">Who We Are</p>
-            <h2 className="wrl-section-title mt-4 max-w-3xl text-balance text-[var(--wrl-secondary-foreground)] [overflow-wrap:anywhere]">
+      <HomeStationFacts />
+
+      <section className="relative isolate flex min-h-[85svh] overflow-hidden text-white">
+        <Image
+          src="/images/entrence.png"
+          alt="Entrance to Wantok Radio Light in Port Moresby"
+          fill
+          quality={88}
+          sizes="100vw"
+          className="-z-30 object-cover object-center"
+        />
+        <div className="absolute inset-0 -z-20 bg-black/58" />
+        <div className="absolute inset-0 -z-10 bg-gradient-to-r from-[#031b18]/95 via-[#003b36]/78 to-[#031b18]/38" />
+
+        <div className="wrl-shell-wide flex w-full flex-col justify-center py-16 sm:py-20 lg:py-24">
+          <div className="max-w-4xl">
+            <p className="wrl-eyebrow text-[var(--wrl-accent-gold)]">Who We Are</p>
+            <h2 className="wrl-section-title mt-5 max-w-4xl text-balance text-white [overflow-wrap:anywhere] sm:text-5xl lg:text-6xl">
               A Christian radio ministry for PNG families and communities
             </h2>
-            <p className="wrl-prose-width mt-6 text-base leading-8 text-[#34423d] md:text-lg">
+            <p className="mt-6 max-w-2xl text-base font-medium leading-8 text-white/88 md:text-lg">
               Wantok Radio Light exists to encourage listeners, strengthen faith, share biblical truth, and serve churches and communities through accessible media.
             </p>
-            <p className="wrl-prose-width mt-5 text-base leading-8 text-[#34423d] md:text-lg">
-              From devotion programs and prayer to family teaching and community updates, WRL keeps the message simple: Jesus brings hope, truth, and new life.
-            </p>
-            <Button asChild variant="gold" size="lg" className="mt-8">
-              <Link href="/about">
-                Learn More
-                <ArrowRight aria-hidden="true" />
-              </Link>
-            </Button>
           </div>
 
-          <div className="wrl-shadow-soft relative mx-auto aspect-[3/4] w-full max-w-[420px] overflow-hidden rounded-lg border border-black/10">
-            <Image
-              src="/images/entrence.png"
-              alt="Entrance to Wantok Radio Light in Port Moresby"
-              fill
-              quality={80}
-              sizes="(max-width: 1023px) 100vw, 420px"
-              className="object-cover"
-            />
+          <div className="mt-10 grid max-w-5xl gap-4 md:grid-cols-2 md:gap-5">
+            <article className="relative overflow-hidden border-l-4 border-[var(--wrl-accent-gold)] bg-[#071512]/88 p-6 shadow-[var(--wrl-shadow-elevated)] backdrop-blur-sm sm:p-8">
+              <span className="text-xs font-black uppercase text-[var(--wrl-accent-gold)]">Purpose</span>
+              <h3 className="mt-3 text-3xl font-black leading-none text-white sm:text-4xl">Our Mission</h3>
+              <p className="mt-5 text-base font-medium leading-7 text-white/82">
+                To preach Jesus Christ to as many Papua New Guineans as possible, in urban and remote communities.
+              </p>
+            </article>
+            <article className="relative overflow-hidden border-l-4 border-[var(--wrl-live-red)] bg-[#071512]/88 p-6 shadow-[var(--wrl-shadow-elevated)] backdrop-blur-sm sm:p-8">
+              <span className="text-xs font-black uppercase text-[#ff8f89]">Direction</span>
+              <h3 className="mt-3 text-3xl font-black leading-none text-white sm:text-4xl">Our Vision</h3>
+              <p className="mt-5 text-base font-medium leading-7 text-white/82">
+                To use electronic media to spread the Gospel across PNG and internationally while addressing the social issues of our day.
+              </p>
+            </article>
           </div>
+
+          <Button asChild variant="gold" size="lg" className="mt-8 w-fit">
+            <Link href="/about">
+              Discover Our Story
+              <ArrowRight aria-hidden="true" />
+            </Link>
+          </Button>
         </div>
       </section>
 
-      <section className="wrl-section-dark py-16 md:py-20">
-        <div className="wrl-shell">
+      <HomeHistoryTimeline />
+
+      <div className="bg-white px-6 py-12 text-center sm:py-14">
+        <p className="wrl-handwritten mx-auto max-w-5xl text-3xl font-bold leading-snug text-[var(--wrl-primary)] sm:text-4xl lg:text-5xl">
+          Reaching towns and remote villages with the Gospel of Jesus Christ through radio.
+        </p>
+      </div>
+
+      <section className="wrl-section-dark relative isolate overflow-hidden py-16 md:py-20">
+        <Image
+          src="/images/impact.png"
+          alt=""
+          fill
+          sizes="100vw"
+          quality={82}
+          className="-z-30 object-cover object-center"
+        />
+        <div className="absolute inset-0 -z-20 bg-black/58" aria-hidden="true" />
+        <div className="absolute inset-0 -z-10 bg-[#003b36]/70" aria-hidden="true" />
+
+        <div className="wrl-shell relative">
           <SectionHeading
             eyebrow="Ministry Impact"
             title="Serving PNG through radio, prayer, and partnership"
             description="The ministry is built on faithful broadcasting, practical support, and Gospel-centered relationships."
           />
-          <div className="mt-10 grid gap-5 sm:grid-cols-2">
+          <div className="mt-10 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
             {impact.map((item) => {
               const Icon = item.icon
 
               return (
-                <article key={item.title} className="wrl-surface-elevated h-full p-6 md:p-7">
-                  <div className="inline-flex h-11 w-11 items-center justify-center rounded-md bg-[var(--wrl-accent-gold)] text-[var(--wrl-accent-gold-foreground)]">
+                <article
+                  key={item.title}
+                  className="wrl-impact-card group flex min-h-[300px] h-full flex-col p-7"
+                  style={{
+                    "--impact-color": item.color,
+                    "--impact-foreground": item.foreground,
+                    "--impact-glow": item.glow,
+                  } as CSSProperties}
+                >
+                  <div className="inline-flex h-14 w-14 items-center justify-center rounded-md bg-[var(--wrl-accent-gold)] text-[var(--wrl-accent-gold-foreground)] transition-colors duration-300 group-hover:bg-white/90 group-hover:text-[#071512]">
                     <Icon className="h-5 w-5" aria-hidden="true" />
                   </div>
-                  <h3 className="wrl-card-title mt-5 text-white">{item.title}</h3>
-                  <p className="wrl-body mt-3 text-[var(--wrl-muted-foreground)]">
+                  <h3 className={`mt-7 text-2xl leading-tight text-white transition-colors duration-300 ${item.titleClass}`}>
+                    {item.title}
+                  </h3>
+                  <p className="mt-5 text-base leading-7 text-[var(--wrl-muted-foreground)] transition-colors duration-300 group-hover:text-current group-hover:opacity-90">
                     {item.description}
                   </p>
                 </article>
@@ -329,98 +372,69 @@ export default async function HomePage() {
         </div>
       </section>
 
-      <section className="wrl-section-light py-16 md:py-20">
-        <div className="wrl-shell">
-          <div className="flex flex-col gap-7 lg:flex-row lg:items-end lg:justify-between">
-            <SectionHeading
-              eyebrow="Coverage"
-              title="Listen by radio or online"
-              description="Choose the listening option that works best for your location."
-              tone="light"
-            />
-            <Button asChild variant="default" size="lg" className="w-fit">
-              <Link href="/coverage">
-                View Coverage
-                <ArrowRight aria-hidden="true" />
-              </Link>
-            </Button>
+      <section className="wrl-section-light relative isolate overflow-hidden py-16 md:py-20">
+        <Image
+          src="/images/listern.png"
+          alt=""
+          fill
+          sizes="100vw"
+          quality={82}
+          className="-z-20 object-cover object-center"
+        />
+        <div className="absolute inset-0 -z-10 bg-[#003b36]/82" aria-hidden="true" />
+
+        <div className="wrl-shell relative">
+          <div className="max-w-4xl">
+            <p className="wrl-eyebrow text-[var(--wrl-accent-gold)]">Where to Listen</p>
+            <h2 className="wrl-section-title mt-4 text-balance text-white">
+              The whole nation, <span className="font-serif font-bold italic text-[var(--wrl-accent-gold)]">and beyond.</span>
+            </h2>
           </div>
 
-          <div className="mt-10 grid gap-5 lg:grid-cols-[minmax(0,1.35fr)_minmax(280px,0.65fr)]">
-            <div className="relative isolate overflow-hidden rounded-lg border border-white/12 bg-[var(--wrl-primary)] p-6 text-white shadow-[var(--wrl-shadow-soft)] sm:p-8">
-              <div
-                className="pointer-events-none absolute right-5 top-6 -z-10 flex h-16 items-center gap-1 opacity-20 sm:right-8"
-                aria-hidden="true"
-              >
-                {[24, 42, 60, 34, 52, 28, 46, 64, 38].map((height, index) => (
-                  <span
-                    key={`${height}-${index}`}
-                    className="block w-1.5 rounded-full bg-[var(--wrl-accent-gold)]"
-                    style={{ height }}
-                  />
-                ))}
+          <div className="mt-10 grid gap-5 lg:grid-cols-[minmax(320px,1.02fr)_minmax(0,1.18fr)]">
+            <article className="relative isolate min-h-[430px] transform-gpu overflow-hidden rounded-lg bg-[var(--wrl-primary)] text-white shadow-[var(--wrl-shadow-elevated)] transition-[transform,box-shadow,border-color] duration-500 hover:scale-[1.02] hover:shadow-[0_0_34px_rgba(37,99,235,0.62),0_24px_62px_rgba(0,0,0,0.42)] motion-reduce:transition-none motion-reduce:hover:scale-100">
+              <Image
+                src="/images/tower.png"
+                alt="Wantok Radio Light broadcast tower serving Papua New Guinea"
+                fill
+                quality={82}
+                sizes="(max-width: 1023px) 100vw, 46vw"
+                className="-z-20 object-cover object-center"
+              />
+              <div className="absolute inset-0 -z-10 bg-gradient-to-t from-[#071512]/95 via-[#003b36]/52 to-black/10" />
+              <div className="flex h-full min-h-[430px] flex-col justify-end p-7 sm:p-8">
+                <p className="wrl-eyebrow text-[var(--wrl-accent-gold)]">Coverage</p>
+                <h3 className="mt-4 text-3xl font-black text-white sm:text-4xl">105.9 FM nationwide</h3>
+                <p className="mt-4 max-w-lg text-base font-medium leading-7 text-white/86">
+                  31 FM sites across Papua New Guinea, with 93.9 FM serving Port Moresby.
+                </p>
+                <Button asChild variant="gold" size="lg" className="mt-7 w-fit">
+                  <Link href="/coverage">See the coverage map<ArrowRight aria-hidden="true" /></Link>
+                </Button>
               </div>
+            </article>
 
-              <p className="wrl-eyebrow text-[var(--wrl-accent-gold)]">Broadcast Frequencies</p>
-              <h3 className="mt-4 max-w-xl text-balance text-2xl font-extrabold leading-tight text-white sm:text-3xl">
-                Terrestrial coverage
-              </h3>
-              <div className="mt-7 grid gap-4 sm:grid-cols-2">
-                {broadcastCoverage.map((item) => {
-                  const Icon = item.icon
-
-                  return (
-                    <article
-                      key={item.location}
-                      className="rounded-lg border border-white/12 bg-white/[0.06] p-5"
-                    >
-                      <div className="flex items-start gap-3">
-                        <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-md bg-[var(--wrl-accent-gold)] text-[var(--wrl-accent-gold-foreground)]">
-                          <Icon className="h-5 w-5" aria-hidden="true" />
-                        </div>
-                        <div className="min-w-0">
-                          <p className="text-xs font-bold uppercase text-white/65">{item.eyebrow}</p>
-                          <h4 className="mt-1 text-lg font-extrabold text-white [overflow-wrap:anywhere]">
-                            {item.location}
-                          </h4>
-                        </div>
-                      </div>
-                      <p className="mt-5 text-2xl font-black text-[var(--wrl-accent-gold)] [overflow-wrap:anywhere]">
-                        {item.frequency}
-                      </p>
-                      <p className="mt-3 text-sm leading-6 text-white/75">{item.description}</p>
-                    </article>
-                  )
-                })}
-              </div>
-            </div>
-
-            <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-1">
-              {digitalListeningOptions.map((item) => {
-                const Icon = item.icon
-
-                return (
-                  <Link
-                    key={item.title}
-                    href={item.href}
-                    aria-label={`${item.title}: ${item.description}`}
-                    className="group block rounded-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--wrl-primary)] focus-visible:ring-offset-4 focus-visible:ring-offset-[var(--wrl-secondary)]"
-                  >
-                    <article className="h-full rounded-lg border border-black/10 bg-white p-6 shadow-[var(--wrl-shadow-soft)] transition-colors duration-200 group-hover:border-[var(--wrl-accent-gold)]">
-                      <div className="flex items-center justify-between gap-4">
-                        <div className="flex h-11 w-11 items-center justify-center rounded-md bg-[var(--wrl-primary)] text-white">
-                          <Icon className="h-5 w-5" aria-hidden="true" />
-                        </div>
-                        <ArrowRight className="h-5 w-5 text-[var(--wrl-primary)] transition-transform duration-200 group-hover:translate-x-1" aria-hidden="true" />
-                      </div>
-                      <h3 className="mt-5 text-xl font-extrabold text-[var(--wrl-secondary-foreground)]">
-                        {item.title}
-                      </h3>
-                      <p className="mt-3 text-sm leading-6 text-[#34423d]">{item.description}</p>
-                    </article>
-                  </Link>
-                )
-              })}
+            <div className="grid gap-4 sm:grid-cols-2">
+              <article className="rounded-lg border border-black/10 bg-white p-6 shadow-[var(--wrl-shadow-soft)] transition-[box-shadow,border-color] duration-300 hover:border-[#d71920] hover:shadow-[0_0_28px_rgba(215,25,32,0.58),0_18px_42px_rgba(0,0,0,0.24)]">
+                <span className="inline-flex rounded-full bg-[#fbe8e6] px-3 py-1 text-xs font-black uppercase text-[#a52a22]">Closed</span>
+                <h3 className="mt-4 text-xl font-black text-[var(--wrl-secondary-foreground)]">Shortwave</h3>
+                <p className="mt-3 text-sm leading-6 text-[#52605b]">7325 kHz from Teka, Mt. Hagen, is closed and awaiting an upgrade.</p>
+              </article>
+              <article className="rounded-lg border border-black/10 bg-white p-6 shadow-[var(--wrl-shadow-soft)] transition-[box-shadow,border-color] duration-300 hover:border-[var(--wrl-accent-gold)] hover:shadow-[0_0_28px_rgba(247,201,40,0.62),0_18px_42px_rgba(0,0,0,0.24)]">
+                <p className="wrl-eyebrow text-[#9a7100]">FM</p>
+                <h3 className="mt-4 text-xl font-black text-[var(--wrl-secondary-foreground)]">93.9 &amp; 105.9 FM</h3>
+                <p className="mt-3 text-sm leading-6 text-[#52605b]">93.9 FM in Port Moresby and 105.9 FM nationwide across 31 FM sites in PNG.</p>
+              </article>
+              <article className="rounded-lg border border-black/10 bg-white p-6 shadow-[var(--wrl-shadow-soft)] transition-[box-shadow,border-color] duration-300 hover:border-[#2563eb] hover:shadow-[0_0_28px_rgba(37,99,235,0.6),0_18px_42px_rgba(0,0,0,0.24)]">
+                <p className="wrl-eyebrow text-[#9a7100]">Online</p>
+                <h3 className="mt-4 text-xl font-black text-[var(--wrl-secondary-foreground)]">Live Stream</h3>
+                <p className="mt-3 text-sm leading-6 text-[#52605b]">Press play at the top of any page. The live stream keeps playing as you browse.</p>
+              </article>
+              <article className="rounded-lg border border-black/10 bg-white p-6 shadow-[var(--wrl-shadow-soft)] transition-[box-shadow,border-color] duration-300 hover:border-[#007a52] hover:shadow-[0_0_28px_rgba(0,122,82,0.62),0_18px_42px_rgba(0,0,0,0.24)]">
+                <p className="wrl-eyebrow text-[#9a7100]">Mobile</p>
+                <h3 className="mt-4 text-xl font-black text-[var(--wrl-secondary-foreground)]">Apps</h3>
+                <p className="mt-3 text-sm leading-6 text-[#52605b]">Listen on the go with our Android and iPhone apps.</p>
+              </article>
             </div>
           </div>
         </div>
@@ -471,56 +485,37 @@ export default async function HomePage() {
         </div>
       </section>
 
-      <section className="wrl-section-light py-14 md:py-16">
-        <div className="wrl-shell-wide">
-          <div className="relative isolate overflow-hidden border-y border-black/10 py-10 md:py-12">
-            <div
-              className="pointer-events-none absolute inset-y-0 right-0 -z-10 hidden w-[42%] opacity-20 lg:block"
-              aria-hidden="true"
-            >
-              {[18, 34, 50, 70, 44, 82, 58, 38, 64, 28].map((height, index) => (
-                <span
-                  key={`${height}-${index}`}
-                  className="absolute top-1/2 w-2 -translate-y-1/2 rounded-full bg-[var(--wrl-primary)]"
-                  style={{ height, right: `${index * 9}%` }}
-                />
-              ))}
-            </div>
-
-            <div className="grid gap-9 lg:grid-cols-[minmax(0,1fr)_220px] lg:items-center lg:gap-14">
-              <div className="max-w-3xl">
-                <p className="wrl-eyebrow text-[var(--wrl-live-red)]">Support the Ministry</p>
-                <h2 className="wrl-section-title mt-4 text-balance text-[var(--wrl-secondary-foreground)] [overflow-wrap:anywhere]">
-                  Stand with Wantok Radio Light
-                </h2>
-                <p className="wrl-prose-width mt-5 text-base leading-8 text-[#34423d] md:text-lg">
-                  Prayer, giving, sponsorship, volunteering, and partnership help WRL continue sharing Christian radio programs with listeners across Papua New Guinea.
-                </p>
-                <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
-                  <Button asChild variant="gold" size="lg" className="w-full sm:w-fit">
-                    <Link href="/support-us">
-                      Support WRL
-                      <ArrowRight aria-hidden="true" />
-                    </Link>
-                  </Button>
-                  <Button
-                    asChild
-                    variant="outline"
-                    size="lg"
-                    className="w-full border-[var(--wrl-primary)]/35 text-[var(--wrl-primary)] hover:bg-[var(--wrl-primary)] hover:text-white sm:w-fit"
-                  >
-                    <Link href="/donate">Donation Information</Link>
-                  </Button>
-                </div>
-              </div>
-
-              <div className="hidden justify-self-end lg:block" aria-hidden="true">
-                <div className="flex h-36 w-36 items-center justify-center rounded-full border border-[var(--wrl-primary)]/25 bg-white/55 text-[var(--wrl-primary)] shadow-[var(--wrl-shadow-soft)]">
-                  <HandHeart className="h-16 w-16" strokeWidth={1.5} />
-                </div>
-              </div>
-            </div>
+      <section className="wrl-section-light py-10 md:py-12">
+        <div className="wrl-shell">
+          <div className="flex flex-col gap-5 lg:flex-row lg:items-end lg:justify-between">
+            <SectionHeading
+              eyebrow="Reach the Unreached"
+              title="Keep the light on air"
+              description="Every broadcast is made possible by people like you. Share-a-thon is our yearly fundraising drive, and there are practical ways to stand with WRL all year round."
+              tone="light"
+            />
+            <Button asChild variant="default" size="lg" className="w-fit">
+              <Link href="/support-us">All ways to support<ArrowRight aria-hidden="true" /></Link>
+            </Button>
           </div>
+
+          <div className="mt-7 grid gap-4 lg:grid-cols-3">
+            {supportPaths.map(({ title, description, href, action, icon: Icon, featured }) => (
+              <article key={title} className={featured ? "flex h-full flex-col rounded-lg bg-[var(--wrl-accent-gold)] p-5 text-[var(--wrl-accent-gold-foreground)] shadow-[var(--wrl-shadow-soft)] md:p-6" : "flex h-full flex-col rounded-lg border border-black/10 bg-white p-5 text-[var(--wrl-secondary-foreground)] shadow-[var(--wrl-shadow-soft)] md:p-6"}>
+                <div className={featured ? "flex h-10 w-10 items-center justify-center rounded-md bg-[var(--wrl-primary)] text-[var(--wrl-accent-gold)]" : "flex h-10 w-10 items-center justify-center rounded-md bg-[var(--wrl-primary)] text-[var(--wrl-accent-gold)]"}>
+                  <Icon className="h-5 w-5" aria-hidden="true" />
+                </div>
+                <h3 className="mt-4 text-xl font-extrabold">{title}</h3>
+                <p className="mt-2 flex-1 text-sm leading-6 opacity-80">{description}</p>
+                <Link href={href} className={featured ? "mt-4 inline-flex min-h-11 w-fit items-center gap-2 rounded-md bg-[var(--wrl-primary)] px-4 py-2 text-sm font-bold text-white transition-colors hover:bg-[#071512] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white" : "mt-4 inline-flex min-h-11 w-fit items-center gap-2 rounded-md font-bold text-[var(--wrl-primary)] underline decoration-[var(--wrl-accent-gold)] underline-offset-4 hover:text-[var(--wrl-live-red)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--wrl-primary)]"}>
+                  {action}<ArrowRight className="h-4 w-4" aria-hidden="true" />
+                </Link>
+              </article>
+            ))}
+          </div>
+          <p className="mt-6 text-center font-serif text-xl font-bold italic text-[var(--wrl-primary)]">
+            Thank you for your continued support.
+          </p>
         </div>
       </section>
 
@@ -594,6 +589,22 @@ export default async function HomePage() {
               </Button>
             </div>
           )}
+        </div>
+      </section>
+
+      <section className="wrl-section-light py-16 md:py-20">
+        <div className="wrl-shell">
+          <figure className="mx-auto max-w-4xl text-center">
+            <p className="wrl-eyebrow text-[var(--wrl-live-red)]">A Testimony</p>
+            <Quote className="mx-auto mt-5 h-10 w-10 fill-[var(--wrl-accent-gold)] text-[var(--wrl-accent-gold)]" aria-hidden="true" />
+            <blockquote className="mt-6 text-balance font-serif text-2xl font-bold leading-relaxed text-[var(--wrl-secondary-foreground)] sm:text-3xl sm:leading-relaxed">
+              “Mind, I&apos;m not a regular listener to this Godly station, but I broke down crying softly in my car. I have fallen from grace, backslidden. This story just opened my stubborn mind and heart.”
+            </blockquote>
+            <figcaption className="mt-8">
+              <p className="font-extrabold text-[var(--wrl-secondary-foreground)]">Eddie Siavor</p>
+              <p className="mt-1 text-sm text-[#52605b]">Port Moresby, Papua New Guinea</p>
+            </figcaption>
+          </figure>
         </div>
       </section>
 

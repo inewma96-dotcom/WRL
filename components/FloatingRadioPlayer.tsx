@@ -20,7 +20,8 @@ type FloatingRadioPlayerProps = {
   variant?: "floating" | "topbar"
 }
 
-const signalBars = [10, 18, 26, 14, 22]
+const signalBars = [12, 22, 16, 30, 20, 26, 14, 28, 18, 24, 12]
+const signalColors = ["#f7c928", "#ffffff", "#42b649", "#f7c928", "#d71920"]
 
 const statusLabels: Record<PlayerStatus, string> = {
   idle: "Ready",
@@ -221,9 +222,9 @@ export default function FloatingRadioPlayer({ src, variant = "floating" }: Float
         <p className="truncate text-[10px] font-extrabold uppercase tracking-[0.14em] text-[var(--wrl-accent-gold)] sm:text-[11px]">
           Listen Live
         </p>
-        <p className="truncate text-xs font-bold text-white sm:text-sm">
-          Wantok Radio Light
-          <span className="ml-1.5 border-l border-white/24 pl-1.5 font-semibold text-white/68">
+        <p className="flex min-w-0 items-center text-xs font-bold text-white sm:text-sm">
+          <span className="min-w-0 truncate">Wantok Radio Light</span>
+          <span className="ml-1.5 shrink-0 whitespace-nowrap border-l border-white/24 pl-1.5 font-semibold text-white/68">
             93.9 FM
           </span>
         </p>
@@ -241,18 +242,20 @@ export default function FloatingRadioPlayer({ src, variant = "floating" }: Float
       </div>
 
       <div
-        className="hidden h-8 shrink-0 items-center gap-1 border-x border-white/12 px-3 sm:flex"
+        className="wrl-live-waveform flex h-9 w-[72px] shrink-0 items-center justify-center gap-1 border-x border-white/12 px-2 sm:w-[92px] sm:px-3"
+        data-playing={isPlaying}
         aria-hidden="true"
       >
         {signalBars.map((height, index) => (
           <span
             key={`${height}-${index}`}
-            className={cn(
-              "block w-1 rounded-full bg-white/32",
-              isPlaying && "bg-[var(--wrl-accent-gold)]",
-              index === 2 && isPlaying && "bg-[var(--wrl-cream)]",
-            )}
-            style={{ height }}
+            className="wrl-live-wave-bar block w-1 rounded-full"
+            style={{
+              height,
+              backgroundColor: signalColors[index % signalColors.length],
+              animationDelay: `${index * -90}ms`,
+              animationDuration: `${620 + (index % 4) * 110}ms`,
+            }}
           />
         ))}
       </div>

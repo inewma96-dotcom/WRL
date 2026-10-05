@@ -57,13 +57,13 @@ export default function NewsUpdateCard({
             className={
               isFeatured
                 ? "mt-3 text-balance text-2xl font-extrabold leading-tight [overflow-wrap:anywhere] sm:text-3xl lg:text-4xl"
-                : "mt-2 text-balance text-xl font-extrabold leading-snug text-white [overflow-wrap:anywhere]"
+                : "mt-2 line-clamp-2 min-h-[3.4rem] text-balance text-xl font-extrabold leading-snug text-white [overflow-wrap:anywhere]"
             }
           >
             {title}
           </h3>
           {content ? (
-            <p className={isFeatured ? "mt-5 line-clamp-5 text-base leading-7 text-[#34423d]" : "mt-3 line-clamp-3 text-sm leading-6 text-white/72"}>
+            <p className={isFeatured ? "mt-5 line-clamp-5 text-base leading-7 text-[#34423d]" : "mt-3 line-clamp-1 min-h-6 text-sm leading-6 text-white/72"}>
               {isFeatured ? content : summarize(content)}
             </p>
           ) : null}
