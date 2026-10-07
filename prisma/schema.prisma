@@ -69,6 +69,26 @@ model PrayerRequest {
   createdAt DateTime @default(now())
 }
 
+model Pledge {
+  id              String   @id @default(cuid())
+  fullName        String
+  category        String
+  address         String?
+  location        String
+  email           String
+  mobile          String
+  church          String?
+  congregation    String?
+  pledgeAmount    Float
+  paymentSchedule String
+  scheduleDetails String?
+  paymentMethod   String
+  signedName      String
+  pledgeDate      DateTime
+  status          String   @default("PENDING")
+  createdAt       DateTime @default(now())
+}
+
 model MediaPlaybackEvent {
   id        String  @id @default(cuid())
   mediaUrl  String

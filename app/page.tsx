@@ -1,7 +1,7 @@
 import Image from "next/image"
 import Link from "next/link"
 import type { CSSProperties } from "react"
-import { ArrowRight, BookOpen, Building2, Clock3, HandHeart, Headphones, Heart, Quote, Radio, Users } from "lucide-react"
+import { ArrowRight, BookOpen, Building2, HandHeart, Headphones, Heart, Quote, Radio, Users } from "lucide-react"
 import AirwaveAudioCard from "@/components/AirwaveAudioCard"
 import FacebookPageSection from "@/components/FacebookPageSection"
 import HomeProgramTabs from "@/components/HomeProgramTabs"
@@ -187,53 +187,36 @@ export default async function HomePage() {
           </div>
 
           <aside
-            aria-labelledby="homepage-playout-title"
-            className="wrl-surface-elevated border-[var(--wrl-border-strong)] p-6 sm:p-7 lg:p-8"
+            aria-labelledby="homepage-toksave-title"
+            className="wrl-surface-elevated flex flex-col border-[var(--wrl-border-strong)] p-6 sm:p-7 lg:min-h-[420px] lg:p-8"
           >
-            <div className="flex items-center justify-between gap-4 border-b border-[var(--wrl-border)] pb-4">
+            <div className="flex w-full items-center justify-between gap-4 border-b border-[var(--wrl-border)] pb-4">
               <div>
-                <p className="wrl-eyebrow text-[var(--wrl-accent-gold)]">Broadcast Updates</p>
-                <h2 id="homepage-playout-title" className="mt-2 text-2xl font-extrabold text-white">
-                  Today&apos;s Playout
+                <p className="wrl-eyebrow text-[var(--wrl-accent-gold)]">Important Information</p>
+                <h2 id="homepage-toksave-title" className="mt-2 text-2xl font-extrabold text-white">
+                  TOKSAVE
                 </h2>
               </div>
-              <Radio className="h-7 w-7 shrink-0 text-[var(--wrl-accent-gold)]" aria-hidden="true" />
+              <HandHeart className="h-7 w-7 shrink-0 text-[var(--wrl-accent-gold)]" aria-hidden="true" />
             </div>
 
-            {featuredPlayout ? (
-              <article className="pt-6">
-                <p className="text-xs font-bold uppercase text-[var(--wrl-muted-foreground)]">
-                  Recent program post
-                </p>
-                <h3 className="mt-2 text-balance text-xl font-extrabold leading-snug text-white [overflow-wrap:anywhere] sm:text-2xl">
-                  {featuredPlayout.title}
-                </h3>
-                <p className="mt-4 flex items-start gap-2 text-sm leading-6 text-[var(--wrl-muted-foreground)]">
-                  <Clock3 className="mt-1 h-4 w-4 shrink-0 text-[var(--wrl-accent-gold)]" aria-hidden="true" />
-                  <time dateTime={featuredPlayout.createdAt.toISOString()}>
-                    Posted {formatPlayoutDateTime(featuredPlayout.createdAt)}
-                  </time>
-                </p>
-                {featuredPlayout.description ? (
-                  <p className="mt-4 line-clamp-3 text-sm leading-6 text-white/75">
-                    {featuredPlayout.description}
-                  </p>
-                ) : null}
-              </article>
-            ) : (
-              <div className="pt-6">
-                <p className="text-base font-bold text-white">No recent playout available</p>
-                <p className="mt-2 text-sm leading-6 text-[var(--wrl-muted-foreground)]">
-                  Visit Airwaves for available WRL program recordings and updates.
-                </p>
-              </div>
-            )}
+            <article className="w-full pt-6">
+              <p className="text-xs font-bold uppercase text-[var(--wrl-muted-foreground)]">
+                Share-a-thon
+              </p>
+              <h3 className="mt-2 text-balance text-xl font-extrabold leading-snug text-white sm:text-2xl">
+                Help us reach the unreached
+              </h3>
+              <p className="mt-4 text-sm leading-6 text-white/75">
+                Make a pledge during our annual Share-a-thon and help us reach the unreached.
+              </p>
+            </article>
 
             <Link
-              href="/airwaves"
-              className="mt-6 inline-flex min-h-11 items-center gap-2 rounded-md text-sm font-bold text-[var(--wrl-accent-gold)] underline-offset-4 hover:text-white hover:underline"
+              href="/pledge"
+              className="mt-6 inline-flex min-h-11 w-fit items-center gap-2 rounded-md text-sm font-bold text-[var(--wrl-accent-gold)] underline-offset-4 hover:text-white hover:underline lg:mt-auto"
             >
-              View all playouts
+              Make a Pledge
               <ArrowRight className="h-4 w-4" aria-hidden="true" />
             </Link>
           </aside>
