@@ -201,9 +201,17 @@ export default async function HomePage() {
             </div>
 
             <article className="w-full pt-6">
-              <p className="text-xs font-bold uppercase text-[var(--wrl-muted-foreground)]">
-                Share-a-thon
-              </p>
+              <div className="flex flex-wrap items-center gap-3">
+                <p className="text-xs font-bold uppercase text-[var(--wrl-muted-foreground)]">
+                  Share-a-thon
+                </p>
+                <span className="wrl-special-tag-wrap">
+                  <span className="wrl-special-tag">
+                    <span className="absolute left-2 h-1.5 w-1.5 rounded-full bg-white/90" aria-hidden="true" />
+                    Special Program
+                  </span>
+                </span>
+              </div>
               <h3 className="mt-2 text-balance text-xl font-extrabold leading-snug text-white sm:text-2xl">
                 Help us reach the unreached
               </h3>
@@ -375,10 +383,10 @@ export default async function HomePage() {
           </div>
 
           <div className="mt-10 grid gap-5 lg:grid-cols-[minmax(320px,1.02fr)_minmax(0,1.18fr)]">
-            <article className="relative isolate min-h-[430px] transform-gpu overflow-hidden rounded-lg bg-[var(--wrl-primary)] text-white shadow-[var(--wrl-shadow-elevated)] transition-[transform,box-shadow,border-color] duration-500 hover:scale-[1.02] hover:shadow-[0_0_34px_rgba(37,99,235,0.62),0_24px_62px_rgba(0,0,0,0.42)] motion-reduce:transition-none motion-reduce:hover:scale-100">
+            <article className="relative isolate min-h-[430px] transform-gpu overflow-hidden rounded-lg bg-[var(--wrl-primary)] text-white shadow-[var(--wrl-shadow-elevated)] transition-[transform,box-shadow,border-color] duration-500 hover:z-10 hover:-translate-y-2 hover:scale-[1.035] hover:shadow-[0_0_38px_rgba(37,99,235,0.72),0_28px_68px_rgba(0,0,0,0.46)] focus-within:z-10 focus-within:-translate-y-2 focus-within:scale-[1.035] motion-reduce:transition-none motion-reduce:hover:translate-y-0 motion-reduce:hover:scale-100">
               <Image
-                src="/images/tower.png"
-                alt="Wantok Radio Light broadcast tower serving Papua New Guinea"
+                src="/images/map.png"
+                alt="Map of Papua New Guinea representing Wantok Radio Light nationwide coverage"
                 fill
                 quality={82}
                 sizes="(max-width: 1023px) 100vw, 46vw"
@@ -398,22 +406,22 @@ export default async function HomePage() {
             </article>
 
             <div className="grid gap-4 sm:grid-cols-2">
-              <article className="rounded-lg border border-black/10 bg-white p-6 shadow-[var(--wrl-shadow-soft)] transition-[box-shadow,border-color] duration-300 hover:border-[#d71920] hover:shadow-[0_0_28px_rgba(215,25,32,0.58),0_18px_42px_rgba(0,0,0,0.24)]">
+              <article className="relative transform-gpu rounded-lg border border-black/10 bg-white p-6 shadow-[var(--wrl-shadow-soft)] transition-[transform,box-shadow,border-color] duration-500 hover:z-10 hover:-translate-y-2 hover:scale-[1.045] hover:border-[#d71920] hover:shadow-[0_0_34px_rgba(215,25,32,0.68),0_24px_52px_rgba(0,0,0,0.3)] motion-reduce:transition-none motion-reduce:hover:translate-y-0 motion-reduce:hover:scale-100">
                 <span className="inline-flex rounded-full bg-[#fbe8e6] px-3 py-1 text-xs font-black uppercase text-[#a52a22]">Closed</span>
                 <h3 className="mt-4 text-xl font-black text-[var(--wrl-secondary-foreground)]">Shortwave</h3>
                 <p className="mt-3 text-sm leading-6 text-[#52605b]">7325 kHz from Teka, Mt. Hagen, is closed and awaiting an upgrade.</p>
               </article>
-              <article className="rounded-lg border border-black/10 bg-white p-6 shadow-[var(--wrl-shadow-soft)] transition-[box-shadow,border-color] duration-300 hover:border-[var(--wrl-accent-gold)] hover:shadow-[0_0_28px_rgba(247,201,40,0.62),0_18px_42px_rgba(0,0,0,0.24)]">
+              <article className="relative transform-gpu rounded-lg border border-black/10 bg-white p-6 shadow-[var(--wrl-shadow-soft)] transition-[transform,box-shadow,border-color] duration-500 hover:z-10 hover:-translate-y-2 hover:scale-[1.045] hover:border-[var(--wrl-accent-gold)] hover:shadow-[0_0_34px_rgba(247,201,40,0.72),0_24px_52px_rgba(0,0,0,0.3)] motion-reduce:transition-none motion-reduce:hover:translate-y-0 motion-reduce:hover:scale-100">
                 <p className="wrl-eyebrow text-[#9a7100]">FM</p>
                 <h3 className="mt-4 text-xl font-black text-[var(--wrl-secondary-foreground)]">93.9 &amp; 105.9 FM</h3>
                 <p className="mt-3 text-sm leading-6 text-[#52605b]">93.9 FM in Port Moresby and 105.9 FM nationwide across 31 FM sites in PNG.</p>
               </article>
-              <article className="rounded-lg border border-black/10 bg-white p-6 shadow-[var(--wrl-shadow-soft)] transition-[box-shadow,border-color] duration-300 hover:border-[#2563eb] hover:shadow-[0_0_28px_rgba(37,99,235,0.6),0_18px_42px_rgba(0,0,0,0.24)]">
+              <article className="relative transform-gpu rounded-lg border border-black/10 bg-white p-6 shadow-[var(--wrl-shadow-soft)] transition-[transform,box-shadow,border-color] duration-500 hover:z-10 hover:-translate-y-2 hover:scale-[1.045] hover:border-[#2563eb] hover:shadow-[0_0_34px_rgba(37,99,235,0.7),0_24px_52px_rgba(0,0,0,0.3)] motion-reduce:transition-none motion-reduce:hover:translate-y-0 motion-reduce:hover:scale-100">
                 <p className="wrl-eyebrow text-[#9a7100]">Online</p>
                 <h3 className="mt-4 text-xl font-black text-[var(--wrl-secondary-foreground)]">Live Stream</h3>
                 <p className="mt-3 text-sm leading-6 text-[#52605b]">Press play at the top of any page. The live stream keeps playing as you browse.</p>
               </article>
-              <article className="rounded-lg border border-black/10 bg-white p-6 shadow-[var(--wrl-shadow-soft)] transition-[box-shadow,border-color] duration-300 hover:border-[#007a52] hover:shadow-[0_0_28px_rgba(0,122,82,0.62),0_18px_42px_rgba(0,0,0,0.24)]">
+              <article className="relative transform-gpu rounded-lg border border-black/10 bg-white p-6 shadow-[var(--wrl-shadow-soft)] transition-[transform,box-shadow,border-color] duration-500 hover:z-10 hover:-translate-y-2 hover:scale-[1.045] hover:border-[#007a52] hover:shadow-[0_0_34px_rgba(0,122,82,0.72),0_24px_52px_rgba(0,0,0,0.3)] motion-reduce:transition-none motion-reduce:hover:translate-y-0 motion-reduce:hover:scale-100">
                 <p className="wrl-eyebrow text-[#9a7100]">Mobile</p>
                 <h3 className="mt-4 text-xl font-black text-[var(--wrl-secondary-foreground)]">Apps</h3>
                 <p className="mt-3 text-sm leading-6 text-[#52605b]">Listen on the go with our Android and iPhone apps.</p>
