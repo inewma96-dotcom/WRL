@@ -6,7 +6,6 @@ import AirwaveAudioCard from "@/components/AirwaveAudioCard"
 import FacebookPageSection from "@/components/FacebookPageSection"
 import HomeProgramTabs from "@/components/HomeProgramTabs"
 import HomeHistoryTimeline from "@/components/HomeHistoryTimeline"
-import HomeStationFacts from "@/components/HomeStationFacts"
 import NewsUpdateCard from "@/components/NewsUpdateCard"
 import { SectionHeading } from "@/components/sections/PublicPageSections"
 import { Button } from "@/components/ui/button"
@@ -55,6 +54,13 @@ const impact = [
   { title: "Christian programs daily", description: "Bible teaching, prayer, family programs, worship, and community encouragement.", icon: BookOpen, color: "#f7c928", foreground: "#071512", glow: "rgba(247, 201, 40, 0.48)", titleClass: "font-serif font-bold italic" },
   { title: "FM, shortwave, and online", description: "Listeners can tune in through radio, live stream, and mobile listening options.", icon: Headphones, color: "#007a52", foreground: "#ffffff", glow: "rgba(0, 122, 82, 0.44)", titleClass: "font-black uppercase" },
   { title: "Ministry partners", description: "Local and international partners help keep the Gospel on the air.", icon: Users, color: "#3949ab", foreground: "#ffffff", glow: "rgba(57, 73, 171, 0.42)", titleClass: "font-serif font-black" },
+]
+
+const stationFacts = [
+  { label: "On air since January 14", value: "2002" },
+  { label: "FM nationwide", value: "105.9" },
+  { label: "FM sites across PNG", value: "31" },
+  { label: "Live stream worldwide", value: "24/7" },
 ]
 
 const supportPaths = [
@@ -156,8 +162,9 @@ export default async function HomePage() {
         <div className="absolute inset-0 -z-20 bg-black/55" />
         <div className="absolute inset-0 -z-10 bg-[image:var(--wrl-hero-overlay)]" />
 
-        <div className="wrl-shell-wide grid min-h-[calc(100svh-150px)] gap-8 pb-12 pt-28 sm:min-h-[calc(100svh-170px)] sm:gap-10 sm:pb-16 sm:pt-32 lg:grid-cols-[minmax(0,1.05fr)_minmax(320px,0.75fr)] lg:items-center lg:gap-14 lg:py-24">
-          <div className="max-w-3xl">
+        <div className="wrl-shell-wide flex min-h-[calc(100svh-150px)] flex-col justify-center gap-10 pb-10 pt-28 sm:min-h-[calc(100svh-170px)] sm:gap-12 sm:pb-12 sm:pt-32 lg:py-20">
+          <div className="grid gap-8 sm:gap-10 lg:grid-cols-[minmax(0,1.05fr)_minmax(320px,0.75fr)] lg:items-center lg:gap-14">
+            <div className="max-w-3xl">
             <p className="wrl-eyebrow text-[var(--wrl-accent-gold)]">
               PNG&apos;s Christian Radio Station
             </p>
@@ -184,12 +191,12 @@ export default async function HomePage() {
                 <Link href="/programs">View Programs</Link>
               </Button>
             </div>
-          </div>
+            </div>
 
-          <aside
-            aria-labelledby="homepage-toksave-title"
-            className="wrl-surface-elevated flex flex-col border-[var(--wrl-border-strong)] p-6 sm:p-7 lg:min-h-[420px] lg:p-8"
-          >
+            <aside
+              aria-labelledby="homepage-toksave-title"
+              className="wrl-surface-elevated flex flex-col border-[var(--wrl-border-strong)] p-6 sm:p-7 lg:min-h-[420px] lg:p-8"
+            >
             <div className="flex w-full items-center justify-between gap-4 border-b border-[var(--wrl-border)] pb-4">
               <div>
                 <p className="wrl-eyebrow text-[var(--wrl-accent-gold)]">Important Information</p>
@@ -227,12 +234,26 @@ export default async function HomePage() {
               Make a Pledge
               <ArrowRight className="h-4 w-4" aria-hidden="true" />
             </Link>
-          </aside>
+            </aside>
+          </div>
 
+          <dl className="grid w-full grid-cols-2 border-y border-white/25 bg-[#071512]/45">
+            {stationFacts.map((fact, index) => (
+              <div
+                key={fact.label}
+                className={`px-4 py-4 sm:px-7 sm:py-5 ${index < 2 ? "border-b border-white/20" : ""} ${index % 2 === 0 ? "border-r border-white/20" : ""}`}
+              >
+                <dt className="text-xs font-bold leading-5 text-white/75 sm:text-sm">
+                  {fact.label}
+                </dt>
+                <dd className="mt-1 text-2xl font-black leading-none text-white sm:text-3xl">
+                  {fact.value}
+                </dd>
+              </div>
+            ))}
+          </dl>
         </div>
       </section>
-
-      <HomeStationFacts />
 
       <section className="relative isolate flex min-h-[85svh] overflow-hidden text-white">
         <Image
