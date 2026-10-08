@@ -237,11 +237,11 @@ export default async function HomePage() {
             </aside>
           </div>
 
-          <dl className="grid w-full grid-cols-2 border-y border-white/25 bg-[#071512]/45">
+          <dl className="grid w-full grid-cols-2 border-y border-white/25 bg-[#071512]/45 sm:grid-cols-4">
             {stationFacts.map((fact, index) => (
               <div
                 key={fact.label}
-                className={`px-4 py-4 sm:px-7 sm:py-5 ${index < 2 ? "border-b border-white/20" : ""} ${index % 2 === 0 ? "border-r border-white/20" : ""}`}
+                className={`px-4 py-4 sm:px-6 sm:py-5 ${index < 2 ? "border-b border-white/20 sm:border-b-0" : ""} ${index % 2 === 0 ? "border-r border-white/20" : ""} ${index === 1 ? "sm:border-r" : ""}`}
               >
                 <dt className="text-xs font-bold leading-5 text-white/75 sm:text-sm">
                   {fact.label}
